@@ -1,9 +1,9 @@
 package ml.ridex.ridexapi.model.dao;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 public class Passenger {
     @Id
     private String id;
-    @NonNull
+    @Indexed(unique = true)
     private String phone;
 
     private String token;
@@ -29,16 +29,19 @@ public class Passenger {
 
     private List<String> pastRides;
 
+    private Boolean enabled;
+
     private Boolean suspend;
 
-    public Passenger(@NonNull String phone,
+    public Passenger(String phone,
                      String token,
                      String email,
                      String name,
                      Integer totalRating,
                      Integer totalRides,
                      List<String> pastRides,
-                     Boolean suspend) {
+                     Boolean suspend,
+                     Boolean enabled) {
         this.phone = phone;
         this.token = token;
         this.email = email;
@@ -47,5 +50,6 @@ public class Passenger {
         this.totalRides = totalRides;
         this.pastRides = pastRides;
         this.suspend = suspend;
+        this.enabled = enabled;
     }
 }

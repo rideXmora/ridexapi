@@ -1,10 +1,16 @@
 package ml.ridex.ridexapi.controller;
 
+import com.mongodb.MongoWriteException;
+import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
-import ml.ridex.ridexapi.model.dto.PassengerRegistrationRequest;
+import ml.ridex.ridexapi.model.dto.PassengerDTO;
+import ml.ridex.ridexapi.model.dto.PassengerRegistrationReqDTO;
 import ml.ridex.ridexapi.service.AuthService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 
@@ -14,17 +20,17 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @PostMapping("passenger/signup")
-    public String passengerLogin(@Valid @RequestBody PassengerRegistrationRequest data) {
+    public PassengerDTO passengerLogin(@Valid @RequestBody PassengerRegistrationReqDTO data) {
        try {
            Passenger passenger = authService.passengerRegistration(data);
-           System.out.println(passenger);
-           return passenger.toString();
+           return modelMapper.map(passenger, PassengerDTO.class);
        }
-       catch (Error e) {
-           System.out.println("Error occurred");
-           return "Tada";
+       catch (InvalidOperationException e) {
+           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
        }
-
     }
 }
