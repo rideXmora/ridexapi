@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PassengerRegistrationResponse {
+public class PassengerDTO {
     private String id;
 
     private String phone;

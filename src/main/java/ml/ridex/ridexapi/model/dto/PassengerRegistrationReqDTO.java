@@ -9,14 +9,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NonNull
-public class PassengerRegistrationRequest {
+public class PassengerRegistrationReqDTO {
     private String phone;
 
     private String email;
 
     private String name;
 
-    public PassengerRegistrationRequest(String phone, String email, String name) {
+    public PassengerRegistrationReqDTO(String phone, String email, String name) {
         this.phone = phone;
         this.email = email;
         this.name = name;
