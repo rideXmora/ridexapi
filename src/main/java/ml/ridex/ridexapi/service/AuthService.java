@@ -15,7 +15,7 @@ public class AuthService {
     private PassengerRepository passengerRepository;
 
     public Passenger passengerRegistration(PassengerRegistrationRequest data) {
-        Passenger newPassenger = new Passenger(data.getPhone(), null, data.getEmail(), data.getName(), 0, 0, new ArrayList<>(), false);
+        Passenger newPassenger = new Passenger(data.getPhone(), null, data.getEmail(), data.getName(), 0, 0, new ArrayList<>(), false, false);
         Passenger passenger = passengerRepository.insert(newPassenger);
         return passenger;
     }
