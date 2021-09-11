@@ -21,4 +21,12 @@ public class CustomHashTest {
         assertThat(customHash.getUuid()).isInstanceOf(UUID.class);
         assertThat(customHash.getUuidHash()).asString();
     }
+
+    @Test
+    @DisplayName("Gen hash with uuid and compare hashes")
+    public void compareHash() {
+        customHash = new CustomHash(UUID.randomUUID());
+        assertThat(customHash.getUuid()).isInstanceOf(UUID.class);
+        assertThat(customHash.verifyHash(customHash.getUuidHash())).isTrue();
+    }
 }

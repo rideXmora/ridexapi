@@ -13,10 +13,18 @@ public class CustomHash {
     private final String uuidHash;
 
     public CustomHash() {
-        this.uuid = UUID.randomUUID();
+        this(UUID.randomUUID());
+    }
+
+    public CustomHash(UUID uuid) {
+        this.uuid = uuid;
         this.uuidHash = Hashing
                 .sha256()
                 .hashString(this.uuid.toString(), StandardCharsets.UTF_8)
                 .toString();
+    }
+
+    public boolean verifyHash(String hash) {
+        return this.uuidHash == hash;
     }
 }
