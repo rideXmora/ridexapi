@@ -1,17 +1,14 @@
 package ml.ridex.ridexapi.model.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
-@NoArgsConstructor
-public class PassengerDTO {
+public class PassengerVerifiedResDTO {
     private String id;
 
     private String phone;
@@ -25,6 +22,10 @@ public class PassengerDTO {
     private Integer totalRides;
 
     private List<String> pastRides;
+
+    private String token;
+
+    private UUID refreshToken;
 
     private Boolean enabled;
 

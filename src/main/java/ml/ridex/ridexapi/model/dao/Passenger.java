@@ -33,6 +33,8 @@ public class Passenger {
 
     private Boolean suspend;
 
+    private String otp;
+
     public Passenger(String phone,
                      String token,
                      String email,
@@ -41,7 +43,8 @@ public class Passenger {
                      Integer totalRides,
                      List<String> pastRides,
                      Boolean suspend,
-                     Boolean enabled) {
+                     Boolean enabled,
+                     String otp) {
         this.phone = phone;
         this.token = token;
         this.email = email;
@@ -51,5 +54,6 @@ public class Passenger {
         this.pastRides = pastRides;
         this.suspend = suspend;
         this.enabled = enabled;
+        this.otp = otp;
     }
 }
