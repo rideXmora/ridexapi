@@ -48,7 +48,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/passenger/signup",
                         "/api/driver/login",
                         "/api/driver/signup",
-                        "/api/auth/**"
+                        "/api/auth/**",
+                        "/v3/api-docs/**",
+                        "/api/swagger-ui.html",
+                        "/api/swagger-ui/*"
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()
