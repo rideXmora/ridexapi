@@ -49,8 +49,8 @@ public class AuthService {
                 false,
                 otp);
         try {
-            smsSender.sendSms(data.getPhone(), otp);
             Passenger passenger = passengerRepository.insert(newPassenger);
+            smsSender.sendSms(data.getPhone(), otp);
             return modelMapper.map(passenger, PassengerDTO.class);
         }
         catch (DuplicateKeyException e) {
