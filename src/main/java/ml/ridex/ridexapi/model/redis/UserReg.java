@@ -14,4 +14,9 @@ public class UserReg {
     @Id
     private String phone;
     private String otp;
+
+    public UserReg(String phone, String otp) {
+        this.phone = phone;
+        this.otp = otp;
+    }
 }
