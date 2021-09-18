@@ -8,23 +8,23 @@ import java.util.UUID;
 
 public class CustomHash {
     @Getter
-    private final UUID uuid;
+    private final String txt;
     @Getter
-    private final String uuidHash;
+    private final String txtHash;
 
     public CustomHash() {
-        this(UUID.randomUUID());
+        this(UUID.randomUUID().toString());
     }
 
-    public CustomHash(UUID uuid) {
-        this.uuid = uuid;
-        this.uuidHash = Hashing
+    public CustomHash(String txt) {
+        this.txt = txt;
+        this.txtHash = Hashing
                 .sha256()
-                .hashString(this.uuid.toString(), StandardCharsets.UTF_8)
+                .hashString(this.txt.toString(), StandardCharsets.UTF_8)
                 .toString();
     }
 
     public boolean verifyHash(String hash) {
-        return this.uuidHash == hash;
+        return this.txtHash == hash;
     }
 }
