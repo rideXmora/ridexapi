@@ -1,9 +1,7 @@
 package ml.ridex.ridexapi.helper;
 
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
-import lombok.Data;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.KeyGenerator;
@@ -11,7 +9,6 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Date;
 
 @Component
 public class OtpGenerator {
