@@ -17,7 +17,7 @@ public class Passenger {
     @Indexed(unique = true)
     private String phone;
 
-    private String token;
+    private String refreshToken;
 
     private String email;
 
@@ -33,20 +33,17 @@ public class Passenger {
 
     private Boolean suspend;
 
-    private String otp;
-
     public Passenger(String phone,
-                     String token,
+                     String refreshToken,
                      String email,
                      String name,
                      Integer totalRating,
                      Integer totalRides,
                      List<String> pastRides,
                      Boolean suspend,
-                     Boolean enabled,
-                     String otp) {
+                     Boolean enabled) {
         this.phone = phone;
-        this.token = token;
+        this.refreshToken = refreshToken;
         this.email = email;
         this.name = name;
         this.totalRating = totalRating;
@@ -54,6 +51,5 @@ public class Passenger {
         this.pastRides = pastRides;
         this.suspend = suspend;
         this.enabled = enabled;
-        this.otp = otp;
     }
 }
