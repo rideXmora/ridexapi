@@ -1,28 +1,38 @@
 package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.Role;
+import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.helper.CustomHash;
+import ml.ridex.ridexapi.helper.Otp;
 import ml.ridex.ridexapi.helper.OtpGenerator;
 import ml.ridex.ridexapi.model.dao.Passenger;
-import ml.ridex.ridexapi.model.dto.PassengerDTO;
-import ml.ridex.ridexapi.model.dto.PassengerRegistrationReqDTO;
+import ml.ridex.ridexapi.model.dto.OtpVerifyDTO;
 import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
-import ml.ridex.ridexapi.model.dto.PassengerVerifyDTO;
+import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
+import ml.ridex.ridexapi.model.redis.UserReg;
 import ml.ridex.ridexapi.repository.PassengerRepository;
+import ml.ridex.ridexapi.repository.RedisUserRegRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidKeyException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthService {
 
     @Autowired
     private PassengerRepository passengerRepository;
+
+    @Autowired
+    private RedisUserRegRepository redisUserRegRepository;
 
     @Autowired
     private TwilioSmsSender smsSender;
@@ -36,43 +46,60 @@ public class AuthService {
     @Autowired
     private JWTService jwtService;
 
-    public PassengerDTO passengerRegistration(PassengerRegistrationReqDTO data) throws InvalidKeyException {
-        String otp = otpGenerator.generateOTP();
-        Passenger newPassenger = new Passenger(data.getPhone(),
+    private void redisSaveService(String phone, Role role, String otpHash, long exp) {
+        redisUserRegRepository.save(new UserReg(phone, role, otpHash, exp));
+    }
+
+    private boolean redisVerifyOtp(String phone, Role role, String otp) {
+        Optional<UserReg> userRegOptional = redisUserRegRepository.findById(phone);
+        if(userRegOptional.isEmpty())
+            throw new EntityNotFoundException("Can't find the user record");
+        UserReg userReg = userRegOptional.get();
+        if(userReg.getRole() != role) {
+            throw new InvalidOperationException("Invalid operation");
+        }
+        if(userReg.getExp() < Instant.now().getEpochSecond())
+            throw new InvalidOperationException("OTP expired");
+        CustomHash hash = new CustomHash(otp);
+        return hash.verifyHash(userReg.getOtpHash());
+    }
+
+    public String passengerPhoneAuth(PhoneAuthDTO phoneAuthDTO) throws InvalidKeyException {
+        if(passengerRepository.existsByPhone(phoneAuthDTO.getPhone()))
+            throw new InvalidOperationException("Passenger already exists");
+        Otp otp = otpGenerator.generateOTP();
+        CustomHash otpHash = new CustomHash(otp.getOtp());
+        this.redisSaveService(phoneAuthDTO.getPhone(), Role.PASSENGER, otpHash.getTxtHash(), otp.getExp());
+        smsSender.sendSms(phoneAuthDTO.getPhone(), otp.getOtp());
+        return "OTP is sent";
+    }
+
+    public PassengerVerifiedResDTO passengerVerify(OtpVerifyDTO data) {
+        if(!this.redisVerifyOtp(data.getPhone(), Role.PASSENGER, data.getOtp()))
+            throw new InvalidOperationException("Invalid OTP");
+
+        CustomHash uuidHashGen = new CustomHash();
+        Passenger passenger = new Passenger(data.getPhone(),
+                uuidHashGen.getTxtHash(),
                 null,
-                data.getEmail(),
-                data.getName(),
+                null,
                 0,
                 0,
                 new ArrayList<>(),
                 false,
-                false,
-                otp);
+                false);
         try {
-            Passenger passenger = passengerRepository.insert(newPassenger);
-            smsSender.sendSms(data.getPhone(), otp);
-            return modelMapper.map(passenger, PassengerDTO.class);
+            passengerRepository.save(passenger);
         }
         catch (DuplicateKeyException e) {
             throw new InvalidOperationException("User already exists");
         }
-    }
-
-    public PassengerVerifiedResDTO passengerVerify(PassengerVerifyDTO data) {
-        Passenger passenger = passengerRepository.findByPhoneAndOtp(data.getPhone(), data.getOtp());
-        if(passenger == null) throw new InvalidOperationException("Invalid data");
-
-        passenger.setOtp(""); // Remove otp
-        CustomHash uuidHashGen = new CustomHash();
-        passenger.setToken(uuidHashGen.getUuidHash());
-        passenger.setEnabled(true); // Enable passenger
-        passengerRepository.save(passenger);
         // Create JWT token
         String token = jwtService.createToken(passenger.getPhone(), Role.PASSENGER);
 
         PassengerVerifiedResDTO responseDTO = modelMapper.map(passenger, PassengerVerifiedResDTO.class);
         responseDTO.setToken(token);
-        responseDTO.setRefreshToken(uuidHashGen.getUuid());
+        responseDTO.setRefreshToken(UUID.fromString(uuidHashGen.getTxt()));
 
         return responseDTO;
     }
