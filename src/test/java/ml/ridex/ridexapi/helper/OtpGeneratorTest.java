@@ -21,7 +21,8 @@ public class OtpGeneratorTest {
 
     @Test
     public void getOtp() throws InvalidKeyException {
-        String otp = otpGenerator.generateOTP();
-        assertThat(otp).asString();
+        Otp otp = otpGenerator.generateOTP();
+        assertThat(otp.getOtp()).asString();
+        assertThat(otp.getExp()).isInstanceOf(Long.class);
     }
 }

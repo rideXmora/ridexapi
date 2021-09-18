@@ -3,6 +3,7 @@ package ml.ridex.ridexapi.model.redis;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import ml.ridex.ridexapi.enums.Role;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
@@ -13,10 +14,14 @@ import org.springframework.data.redis.core.RedisHash;
 public class UserReg {
     @Id
     private String phone;
-    private String otp;
+    private Role role;
+    private String otpHash;
+    private long exp;
 
-    public UserReg(String phone, String otp) {
+    public UserReg(String phone, Role role, String otp, long exp) {
         this.phone = phone;
-        this.otp = otp;
+        this.role = role;
+        this.otpHash = otp;
+        this.exp = exp;
     }
 }
