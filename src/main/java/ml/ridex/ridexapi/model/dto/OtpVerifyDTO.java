@@ -1,13 +1,21 @@
 package ml.ridex.ridexapi.model.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@AllArgsConstructor
 public class OtpVerifyDTO {
+    @NotBlank
+    @Pattern(regexp="(\\+94\\d{9})")
     private String phone;
+
+    @NotBlank
+    @Pattern(regexp = "(\\d{6})")
     private String otp;
 }
