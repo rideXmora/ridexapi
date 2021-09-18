@@ -7,9 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PassengerVerifyDTO {
+public class OtpVerifyDTO {
     private String phone;
-
     private String otp;
-
 }
