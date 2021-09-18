@@ -20,11 +20,11 @@ public class CustomHash {
         this.txt = txt;
         this.txtHash = Hashing
                 .sha256()
-                .hashString(this.txt.toString(), StandardCharsets.UTF_8)
+                .hashString(this.txt, StandardCharsets.UTF_8)
                 .toString();
     }
 
     public boolean verifyHash(String hash) {
-        return this.txtHash == hash;
+        return this.txtHash.equals(hash);
     }
 }
