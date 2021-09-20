@@ -24,16 +24,16 @@ import java.security.InvalidKeyException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/auth")
-@Tag(name="User Authentication")
-public class AuthController {
+@RequestMapping("/api/auth/passenger")
+@Tag(name="Passenger Authentication")
+public class AuthPassengerController {
     @Autowired
     private AuthService authService;
 
     @Autowired
     private ModelMapper modelMapper;
 
-    @PostMapping("/passenger/phoneAuth")
+    @PostMapping("/phoneAuth")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Passenger Send OTP")
     @ApiResponse(responseCode = "200", description = "Saved user in memory")
@@ -47,7 +47,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/passenger/verify")
+    @PostMapping("/verify")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "OTP verification")
     @ApiResponses(value = {
@@ -70,40 +70,4 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/driver/phoneAuth")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Passenger Send OTP")
-    @ApiResponse(responseCode = "200", description = "Saved user in memory")
-    public String driverPhoneAuth(@Valid @RequestBody PhoneAuthDTO phoneAuthDTO) {
-        try {
-            return authService.driverPhoneAuth(phoneAuthDTO);
-        } catch (InvalidKeyException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        } catch (InvalidOperationException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    @PostMapping("/driver/verify")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Driver OTP verification")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successful"),
-            @ApiResponse(responseCode = "400", description = "Invalid OTP/phone")
-    })
-    public PassengerVerifiedResDTO driverVerify(@Valid @RequestBody OtpVerifyDTO data) {
-        try {
-            Driver driver = authService.driverVerify(data);
-            String token = authService.createJwtToken(data.getPhone(), Role.DRIVER);
-            PassengerVerifiedResDTO responseDTO = modelMapper.map(driver, PassengerVerifiedResDTO.class);
-            responseDTO.setToken(token);
-            return responseDTO;
-        }
-        catch (InvalidOperationException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-        catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
-    }
 }
