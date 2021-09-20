@@ -62,14 +62,18 @@ public class AuthService {
         return hash.verifyHash(userReg.getOtpHash());
     }
 
+    private String sendOTP(String phone, Role role) throws InvalidKeyException {
+        Otp otp = otpGenerator.generateOTP();
+        CustomHash otpHash = new CustomHash(otp.getOtp());
+        this.redisSaveService(phone, role, otpHash.getTxtHash(), otp.getExp());
+        smsSender.sendSms(phone, otp.getOtp());
+        return "OTP is sent";
+    }
+
     public String passengerPhoneAuth(PhoneAuthDTO phoneAuthDTO) throws InvalidKeyException {
         if(passengerRepository.existsByPhone(phoneAuthDTO.getPhone()))
             throw new InvalidOperationException("Passenger already exists");
-        Otp otp = otpGenerator.generateOTP();
-        CustomHash otpHash = new CustomHash(otp.getOtp());
-        this.redisSaveService(phoneAuthDTO.getPhone(), Role.PASSENGER, otpHash.getTxtHash(), otp.getExp());
-        smsSender.sendSms(phoneAuthDTO.getPhone(), otp.getOtp());
-        return "OTP is sent";
+        return this.sendOTP(phoneAuthDTO.getPhone(), Role.PASSENGER);
     }
 
     public Passenger passengerVerify(OtpVerifyDTO data) {
@@ -100,11 +104,7 @@ public class AuthService {
     public String driverPhoneAuth(PhoneAuthDTO phoneAuthDTO) throws InvalidKeyException {
         if(driverRepository.existsByPhone(phoneAuthDTO.getPhone()))
             throw new InvalidOperationException("Driver already exists");
-        Otp otp = otpGenerator.generateOTP();
-        CustomHash otpHash = new CustomHash(otp.getOtp());
-        this.redisSaveService(phoneAuthDTO.getPhone(), Role.DRIVER, otpHash.getTxtHash(), otp.getExp());
-        smsSender.sendSms(phoneAuthDTO.getPhone(), otp.getOtp());
-        return "OTP is sent";
+        return this.sendOTP(phoneAuthDTO.getPhone(), Role.DRIVER);
     }
 
     public Driver driverVerify(OtpVerifyDTO data) {
