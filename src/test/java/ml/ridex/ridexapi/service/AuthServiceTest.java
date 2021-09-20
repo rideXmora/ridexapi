@@ -1,11 +1,9 @@
 package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.Role;
-import ml.ridex.ridexapi.helper.Otp;
 import ml.ridex.ridexapi.helper.OtpGenerator;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dto.OtpVerifyDTO;
-import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
 import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
 import ml.ridex.ridexapi.model.redis.UserReg;
 import ml.ridex.ridexapi.repository.DriverRepository;
@@ -18,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.security.InvalidKeyException;

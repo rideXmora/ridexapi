@@ -9,13 +9,11 @@ import ml.ridex.ridexapi.helper.OtpGenerator;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dto.OtpVerifyDTO;
-import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
 import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
 import ml.ridex.ridexapi.model.redis.UserReg;
 import ml.ridex.ridexapi.repository.DriverRepository;
 import ml.ridex.ridexapi.repository.PassengerRepository;
 import ml.ridex.ridexapi.repository.RedisUserRegRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import java.security.InvalidKeyException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AuthService {
