@@ -25,7 +25,7 @@ public class PassengerVerifiedResDTO {
 
     private String token;
 
-    private UUID refreshToken;
+    private String refreshToken;
 
     private Boolean enabled;
 

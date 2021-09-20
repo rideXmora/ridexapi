@@ -6,11 +6,13 @@ import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.helper.CustomHash;
 import ml.ridex.ridexapi.helper.Otp;
 import ml.ridex.ridexapi.helper.OtpGenerator;
+import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dto.OtpVerifyDTO;
 import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
 import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
 import ml.ridex.ridexapi.model.redis.UserReg;
+import ml.ridex.ridexapi.repository.DriverRepository;
 import ml.ridex.ridexapi.repository.PassengerRepository;
 import ml.ridex.ridexapi.repository.RedisUserRegRepository;
 import org.modelmapper.ModelMapper;
@@ -31,6 +33,9 @@ public class AuthService {
     private PassengerRepository passengerRepository;
 
     @Autowired
+    private DriverRepository driverRepository;
+
+    @Autowired
     private RedisUserRegRepository redisUserRegRepository;
 
     @Autowired
@@ -38,9 +43,6 @@ public class AuthService {
 
     @Autowired
     private OtpGenerator otpGenerator;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     @Autowired
     private JWTService jwtService;
@@ -73,12 +75,13 @@ public class AuthService {
         return "OTP is sent";
     }
 
-    public PassengerVerifiedResDTO passengerVerify(OtpVerifyDTO data) {
+    public Passenger passengerVerify(OtpVerifyDTO data) {
         if(!this.redisVerifyOtp(data.getPhone(), Role.PASSENGER, data.getOtp()))
             throw new InvalidOperationException("Invalid OTP");
 
         CustomHash uuidHashGen = new CustomHash();
-        Passenger passenger = new Passenger(data.getPhone(),
+        Passenger passenger = new Passenger(
+                data.getPhone(),
                 uuidHashGen.getTxtHash(),
                 null,
                 null,
@@ -89,17 +92,53 @@ public class AuthService {
                 false);
         try {
             passengerRepository.save(passenger);
+            passenger.setRefreshToken(uuidHashGen.getTxt());
+            return passenger;
         }
         catch (DuplicateKeyException e) {
             throw new InvalidOperationException("User already exists");
         }
-        // Create JWT token
-        String token = jwtService.createToken(passenger.getPhone(), Role.PASSENGER);
+    }
 
-        PassengerVerifiedResDTO responseDTO = modelMapper.map(passenger, PassengerVerifiedResDTO.class);
-        responseDTO.setToken(token);
-        responseDTO.setRefreshToken(UUID.fromString(uuidHashGen.getTxt()));
+    public String driverPhoneAuth(PhoneAuthDTO phoneAuthDTO) throws InvalidKeyException {
+        if(driverRepository.existsByPhone(phoneAuthDTO.getPhone()))
+            throw new InvalidOperationException("Driver already exists");
+        Otp otp = otpGenerator.generateOTP();
+        CustomHash otpHash = new CustomHash(otp.getOtp());
+        this.redisSaveService(phoneAuthDTO.getPhone(), Role.DRIVER, otpHash.getTxtHash(), otp.getExp());
+        smsSender.sendSms(phoneAuthDTO.getPhone(), otp.getOtp());
+        return "OTP is sent";
+    }
 
-        return responseDTO;
+    public Driver driverVerify(OtpVerifyDTO data) {
+        if(!this.redisVerifyOtp(data.getPhone(), Role.DRIVER, data.getOtp()))
+            throw new InvalidOperationException("Invalid OTP");
+
+        CustomHash uuidHashGen = new CustomHash();
+        Driver driver = new Driver(
+                data.getPhone(),
+                uuidHashGen.getTxtHash(),
+                null,
+                null,
+                0,
+                0,
+                new ArrayList<>(),
+                null,
+                null,
+                false,
+                false
+        );
+        try {
+            driverRepository.save(driver);
+            driver.setRefreshToken(uuidHashGen.getTxt());
+            return driver;
+        }
+        catch (DuplicateKeyException e) {
+            throw new InvalidOperationException("User already exists");
+        }
+    }
+
+    public String createJwtToken(String phone, Role role) {
+        return  jwtService.createToken(phone, role);
     }
 }
