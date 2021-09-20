@@ -2,6 +2,7 @@ package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.helper.OtpGenerator;
+import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dto.OtpVerifyDTO;
 import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
@@ -44,14 +45,19 @@ public class AuthServiceTest {
     @Mock
     private JWTService jwtService;
 
-    UserReg userReg;
+    UserReg userRegPassenger;
+    UserReg userRegDriver;
     Passenger passenger;
+    Driver driver;
 
     @BeforeEach
     void setUp() throws Exception {
         authService = new AuthService();
-        userReg = new UserReg("+94714461798", Role.PASSENGER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
+        userRegPassenger = new UserReg("+94714461798", Role.PASSENGER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
+        userRegDriver = new UserReg("+94714461798", Role.DRIVER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
+
         passenger = new Passenger("+94714461798",null,null,null,0,0,new ArrayList<>(),false,false);
+        driver = new Driver("+94714461798", null,null,null,0,0,new ArrayList<>(),null,null,false,false);
 
         ReflectionTestUtils.setField(authService, "redisUserRegRepository", redisUserRegRepository);
         ReflectionTestUtils.setField(authService, "passengerRepository", passengerRepository);
@@ -66,8 +72,8 @@ public class AuthServiceTest {
     void passengerPhoneAuth() throws InvalidKeyException {
         PhoneAuthDTO phoneAuthDTO = new PhoneAuthDTO("+94714461798");
 
-        when(redisUserRegRepository.save(any(UserReg.class))).thenReturn(userReg);
-        when(passengerRepository.existsByPhone(userReg.getPhone())).thenReturn(false);
+        when(redisUserRegRepository.save(any(UserReg.class))).thenReturn(userRegPassenger);
+        when(passengerRepository.existsByPhone(userRegPassenger.getPhone())).thenReturn(false);
         doNothing().when(smsSender).sendSms(anyString(), anyString());
 
         String response = authService.passengerPhoneAuth(phoneAuthDTO);
@@ -78,7 +84,7 @@ public class AuthServiceTest {
     @DisplayName("Passenger OTP verification successfully")
     void passengerVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
-        when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userReg));
+        when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
         when(passengerRepository.save(any(Passenger.class))).thenReturn(passenger);
 
         Passenger response = authService.passengerVerify(dto);
@@ -92,5 +98,74 @@ public class AuthServiceTest {
         when(jwtService.createToken(anyString(), any(Role.class))).thenReturn("SDDDDS");
 
         assertThat(authService.createJwtToken("+94714461798", Role.PASSENGER)).asString();
+    }
+
+    @Test
+    @DisplayName("Driver sing up successfully")
+    void driverPhoneAuth() throws InvalidKeyException {
+        PhoneAuthDTO phoneAuthDTO = new PhoneAuthDTO("+94714461798");
+
+        when(redisUserRegRepository.save(any(UserReg.class))).thenReturn(userRegDriver);
+        when(driverRepository.existsByPhone(userRegPassenger.getPhone())).thenReturn(false);
+        doNothing().when(smsSender).sendSms(anyString(), anyString());
+
+        String response = authService.driverPhoneAuth(phoneAuthDTO);
+        assertThat(response).isEqualTo("OTP is sent");
+    }
+
+    @Test
+    @DisplayName("Driver signup OTP verification successful")
+    public void driverVerify() {
+        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
+        when(driverRepository.save(any(Driver.class))).thenReturn(driver);
+
+        Driver response = authService.driverVerify(dto);
+
+        assertThat(response.getRefreshToken()).asString();
+    }
+
+    @Test
+    @DisplayName("Passenger loginAuth send OTP")
+    public void passengerLoginAuth() throws InvalidKeyException {
+        PhoneAuthDTO phoneAuthDTO = new PhoneAuthDTO("+94714461798");
+        when(passengerRepository.existsByPhone(userRegPassenger.getPhone())).thenReturn(true);
+        doNothing().when(smsSender).sendSms(anyString(), anyString());
+        when(redisUserRegRepository.save(any(UserReg.class))).thenReturn(userRegPassenger);
+        assertThat(authService.passengerLoginAuth(phoneAuthDTO)).isEqualTo("OTP is sent");
+    }
+
+    @Test
+    @DisplayName("Passenger loginVerify success")
+    public void passengerLoginVerify() {
+        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
+        when(passengerRepository.findByPhoneAndSuspend(anyString(),anyBoolean())).thenReturn(Optional.ofNullable(passenger));
+
+        Passenger response = authService.passengerLoginVerify(dto);
+
+        assertThat(response.getRefreshToken()).asString();
+    }
+
+    @Test
+    @DisplayName("Driver loginAuth send OTP")
+    public void driverLoginAuth() throws InvalidKeyException {
+        PhoneAuthDTO phoneAuthDTO = new PhoneAuthDTO("+94714461798");
+        when(driverRepository.existsByPhone(userRegDriver.getPhone())).thenReturn(true);
+        doNothing().when(smsSender).sendSms(anyString(), anyString());
+        when(redisUserRegRepository.save(any(UserReg.class))).thenReturn(userRegDriver);
+        assertThat(authService.driverLoginAuth(phoneAuthDTO)).isEqualTo("OTP is sent");
+    }
+
+    @Test
+    @DisplayName("Driver loginVerify success")
+    public void driverLoginVerify() {
+        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
+        when(driverRepository.findByPhoneAndSuspend(anyString(),anyBoolean())).thenReturn(Optional.ofNullable(driver));
+
+        Driver response = authService.driverLoginVerify(dto);
+
+        assertThat(response.getRefreshToken()).asString();
     }
 }
