@@ -8,6 +8,7 @@ import ml.ridex.ridexapi.model.dto.OtpVerifyDTO;
 import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
 import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
 import ml.ridex.ridexapi.model.redis.UserReg;
+import ml.ridex.ridexapi.repository.DriverRepository;
 import ml.ridex.ridexapi.repository.PassengerRepository;
 import ml.ridex.ridexapi.repository.RedisUserRegRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,8 @@ public class AuthServiceTest {
     @Mock
     PassengerRepository passengerRepository;
     @Mock
+    DriverRepository driverRepository;
+    @Mock
     RedisUserRegRepository redisUserRegRepository;
     @Mock
     TwilioSmsSender smsSender;
@@ -55,6 +58,7 @@ public class AuthServiceTest {
 
         ReflectionTestUtils.setField(authService, "redisUserRegRepository", redisUserRegRepository);
         ReflectionTestUtils.setField(authService, "passengerRepository", passengerRepository);
+        ReflectionTestUtils.setField(authService, "driverRepository", driverRepository);
         ReflectionTestUtils.setField(authService, "otpGenerator", otpGenerator);
         ReflectionTestUtils.setField(authService, "jwtService", jwtService);
         ReflectionTestUtils.setField(authService, "smsSender", smsSender);
