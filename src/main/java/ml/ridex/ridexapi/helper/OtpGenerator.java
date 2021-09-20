@@ -2,6 +2,7 @@ package ml.ridex.ridexapi.helper;
 
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.KeyGenerator;
@@ -15,6 +16,8 @@ public class OtpGenerator {
     private final TimeBasedOneTimePasswordGenerator totp;
     private final KeyGenerator keyGenerator;
     private final Key key;
+    @Value("${OTP_VALIDITY}")
+    private long otpValidity;
     @Getter
     private long exp;
 
@@ -27,6 +30,6 @@ public class OtpGenerator {
 
     public Otp generateOTP() throws InvalidKeyException {
         final Instant now = Instant.now();
-        return new Otp(totp.generateOneTimePasswordString(key, now), now.getEpochSecond() + 300000);
+        return new Otp(totp.generateOneTimePasswordString(key, now), now.getEpochSecond() + otpValidity);
     }
 }

@@ -1,14 +1,20 @@
 package ml.ridex.ridexapi.model.dto;
 
 import lombok.Data;
+import ml.ridex.ridexapi.model.daoHelper.DriverOrganization;
+import ml.ridex.ridexapi.model.daoHelper.Vehicle;
 
 import java.util.List;
 
 @Data
-public class PassengerVerifiedResDTO {
+public class DriverVerifiedResDTO {
     private String id;
 
     private String phone;
+
+    private String token;
+
+    private String refreshToken;
 
     private String email;
 
@@ -20,9 +26,9 @@ public class PassengerVerifiedResDTO {
 
     private List<String> pastRides;
 
-    private String token;
+    private Vehicle vehicle;
 
-    private String refreshToken;
+    private DriverOrganization driverOrganization;
 
     private Boolean enabled;
 
