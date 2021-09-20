@@ -40,9 +40,6 @@ public class AuthService {
     private OtpGenerator otpGenerator;
 
     @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
     private JWTService jwtService;
 
     private void redisSaveService(String phone, Role role, String otpHash, long exp) {
@@ -73,12 +70,13 @@ public class AuthService {
         return "OTP is sent";
     }
 
-    public PassengerVerifiedResDTO passengerVerify(OtpVerifyDTO data) {
+    public Passenger passengerVerify(OtpVerifyDTO data) {
         if(!this.redisVerifyOtp(data.getPhone(), Role.PASSENGER, data.getOtp()))
             throw new InvalidOperationException("Invalid OTP");
 
         CustomHash uuidHashGen = new CustomHash();
-        Passenger passenger = new Passenger(data.getPhone(),
+        Passenger passenger = new Passenger(
+                data.getPhone(),
                 uuidHashGen.getTxtHash(),
                 null,
                 null,
@@ -89,17 +87,15 @@ public class AuthService {
                 false);
         try {
             passengerRepository.save(passenger);
+            passenger.setRefreshToken(uuidHashGen.getTxt());
+            return passenger;
         }
         catch (DuplicateKeyException e) {
             throw new InvalidOperationException("User already exists");
         }
-        // Create JWT token
-        String token = jwtService.createToken(passenger.getPhone(), Role.PASSENGER);
+    }
 
-        PassengerVerifiedResDTO responseDTO = modelMapper.map(passenger, PassengerVerifiedResDTO.class);
-        responseDTO.setToken(token);
-        responseDTO.setRefreshToken(UUID.fromString(uuidHashGen.getTxt()));
-
-        return responseDTO;
+    public String createJwtToken(String phone, Role role) {
+        return  jwtService.createToken(phone, role);
     }
 }

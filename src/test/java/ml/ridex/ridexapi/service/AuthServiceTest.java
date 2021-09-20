@@ -41,8 +41,6 @@ public class AuthServiceTest {
     TwilioSmsSender smsSender;
     @Spy
     private OtpGenerator otpGenerator;
-    @Spy
-    private ModelMapper modelMapper;
     @Mock
     private JWTService jwtService;
 
@@ -58,7 +56,6 @@ public class AuthServiceTest {
         ReflectionTestUtils.setField(authService, "redisUserRegRepository", redisUserRegRepository);
         ReflectionTestUtils.setField(authService, "passengerRepository", passengerRepository);
         ReflectionTestUtils.setField(authService, "otpGenerator", otpGenerator);
-        ReflectionTestUtils.setField(authService, "modelMapper", modelMapper);
         ReflectionTestUtils.setField(authService, "jwtService", jwtService);
         ReflectionTestUtils.setField(authService, "smsSender", smsSender);
     }
@@ -82,10 +79,17 @@ public class AuthServiceTest {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userReg));
         when(passengerRepository.save(any(Passenger.class))).thenReturn(passenger);
+
+        Passenger response = authService.passengerVerify(dto);
+
+        assertThat(response.getRefreshToken()).asString();
+    }
+
+    @Test
+    @DisplayName("Generate JWT")
+    public void jwtGen() {
         when(jwtService.createToken(anyString(), any(Role.class))).thenReturn("SDDDDS");
 
-        PassengerVerifiedResDTO response = authService.passengerVerify(dto);
-
-        assertThat(response.getToken()).asString();
+        assertThat(authService.createJwtToken("+94714461798", Role.PASSENGER)).asString();
     }
 }

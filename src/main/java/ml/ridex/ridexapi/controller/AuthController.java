@@ -4,12 +4,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
+import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dto.OtpVerifyDTO;
 import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
 import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
 import ml.ridex.ridexapi.service.AuthService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.security.InvalidKeyException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,6 +28,9 @@ import java.security.InvalidKeyException;
 public class AuthController {
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @PostMapping("/passenger/phoneAuth")
     @ResponseStatus(HttpStatus.CREATED)
@@ -49,7 +56,11 @@ public class AuthController {
     })
     public PassengerVerifiedResDTO passengerVerify(@Valid @RequestBody OtpVerifyDTO data) {
         try {
-            return authService.passengerVerify(data);
+            Passenger passenger = authService.passengerVerify(data);
+            String token = authService.createJwtToken(data.getPhone(), Role.PASSENGER);
+            PassengerVerifiedResDTO responseDTO = modelMapper.map(passenger, PassengerVerifiedResDTO.class);
+            responseDTO.setToken(token);
+            return responseDTO;
         }
         catch (InvalidOperationException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
