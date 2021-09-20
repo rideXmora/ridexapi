@@ -101,6 +101,28 @@ public class AuthService {
         }
     }
 
+    public String passengerLoginAuth(PhoneAuthDTO phoneAuthDTO) throws InvalidKeyException {
+        if(!passengerRepository.existsByPhone(phoneAuthDTO.getPhone()))
+            throw new InvalidOperationException("Passenger not exists");
+        return this.sendOTP(phoneAuthDTO.getPhone(), Role.PASSENGER);
+    }
+
+    public Passenger passengerLoginVerify(OtpVerifyDTO data) {
+        if(!this.redisVerifyOtp(data.getPhone(), Role.PASSENGER, data.getOtp()))
+            throw new InvalidOperationException("Invalid OTP");
+
+        Optional<Passenger> passengerOptional = passengerRepository.findByPhoneAndSuspend(data.getPhone(), false);
+        if(passengerOptional.isEmpty())
+            throw new InvalidOperationException("Unregistered or suspended passenger");
+        Passenger passenger = passengerOptional.get();
+        CustomHash uuidHashGen = new CustomHash();
+        passenger.setRefreshToken(uuidHashGen.getTxtHash());
+        passengerRepository.save(passenger);
+        // Replace hash value with actual value
+        passenger.setRefreshToken(uuidHashGen.getTxt());
+        return passenger;
+    }
+
     public String driverPhoneAuth(PhoneAuthDTO phoneAuthDTO) throws InvalidKeyException {
         if(driverRepository.existsByPhone(phoneAuthDTO.getPhone()))
             throw new InvalidOperationException("Driver already exists");
@@ -133,6 +155,28 @@ public class AuthService {
         catch (DuplicateKeyException e) {
             throw new InvalidOperationException("User already exists");
         }
+    }
+
+    public String driverLoginAuth(PhoneAuthDTO phoneAuthDTO) throws InvalidKeyException {
+        if(!driverRepository.existsByPhone(phoneAuthDTO.getPhone()))
+            throw new InvalidOperationException("Driver not exists");
+        return this.sendOTP(phoneAuthDTO.getPhone(), Role.DRIVER);
+    }
+
+    public Driver driverLoginVerify(OtpVerifyDTO data) {
+        if(!this.redisVerifyOtp(data.getPhone(), Role.DRIVER, data.getOtp()))
+            throw new InvalidOperationException("Invalid OTP");
+
+        Optional<Driver> driverOptional = driverRepository.findByPhoneAndSuspend(data.getPhone(), false);
+        if(driverOptional.isEmpty())
+            throw new InvalidOperationException("Unregistered or suspended driver");
+        Driver driver = driverOptional.get();
+        CustomHash uuidHashGen = new CustomHash();
+        driver.setRefreshToken(uuidHashGen.getTxtHash());
+        driverRepository.save(driver);
+        // Replace hash value with actual value
+        driver.setRefreshToken(uuidHashGen.getTxt());
+        return driver;
     }
 
     public String createJwtToken(String phone, Role role) {
