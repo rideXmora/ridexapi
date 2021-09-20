@@ -3,7 +3,10 @@ package ml.ridex.ridexapi.repository;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.Optional;
+
 public interface PassengerRepository extends MongoRepository<Passenger, String> {
-    public Passenger findByPhone(String phone);
+    public Optional<Passenger> findByPhone(String phone);
+    public Optional<Passenger> findByPhoneAndSuspend(String phone, boolean suspend);
     public Boolean existsByPhone(String phone);
 }
