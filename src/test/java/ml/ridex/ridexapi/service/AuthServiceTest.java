@@ -11,9 +11,11 @@ import ml.ridex.ridexapi.model.redis.UserReg;
 import ml.ridex.ridexapi.repository.PassengerRepository;
 import ml.ridex.ridexapi.repository.RedisUserRegRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -37,9 +39,9 @@ public class AuthServiceTest {
     RedisUserRegRepository redisUserRegRepository;
     @Mock
     TwilioSmsSender smsSender;
-    @Mock
+    @Spy
     private OtpGenerator otpGenerator;
-    @Mock
+    @Spy
     private ModelMapper modelMapper;
     @Mock
     private JWTService jwtService;
@@ -48,10 +50,11 @@ public class AuthServiceTest {
     Passenger passenger;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         authService = new AuthService();
         userReg = new UserReg("+94714461798", Role.PASSENGER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
         passenger = new Passenger("+94714461798",null,null,null,0,0,new ArrayList<>(),false,false);
+
         ReflectionTestUtils.setField(authService, "redisUserRegRepository", redisUserRegRepository);
         ReflectionTestUtils.setField(authService, "passengerRepository", passengerRepository);
         ReflectionTestUtils.setField(authService, "otpGenerator", otpGenerator);
@@ -61,12 +64,12 @@ public class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Passenger sing up successfully")
     void passengerPhoneAuth() throws InvalidKeyException {
         PhoneAuthDTO phoneAuthDTO = new PhoneAuthDTO("+94714461798");
 
         when(redisUserRegRepository.save(any(UserReg.class))).thenReturn(userReg);
         when(passengerRepository.existsByPhone(userReg.getPhone())).thenReturn(false);
-        when(otpGenerator.generateOTP()).thenReturn(new Otp("1234", 1000));
         doNothing().when(smsSender).sendSms(anyString(), anyString());
 
         String response = authService.passengerPhoneAuth(phoneAuthDTO);
@@ -74,12 +77,13 @@ public class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Passenger OTP verification successfully")
     void passengerVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userReg));
         when(passengerRepository.save(any(Passenger.class))).thenReturn(passenger);
         when(jwtService.createToken(anyString(), any(Role.class))).thenReturn("SDDDDS");
-        when(modelMapper.map(any(Passenger.class), any())).thenReturn(new PassengerVerifiedResDTO());
+
         PassengerVerifiedResDTO response = authService.passengerVerify(dto);
 
         assertThat(response.getToken()).asString();
