@@ -39,7 +39,7 @@ public class AuthServiceTest {
     @Mock
     RedisUserRegRepository redisUserRegRepository;
     @Mock
-    TwilioSmsSender smsSender;
+    SMSSender smsSender;
     @Spy
     private OtpGenerator otpGenerator;
     @Mock

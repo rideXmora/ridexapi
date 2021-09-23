@@ -36,7 +36,7 @@ public class AuthService {
     private RedisUserRegRepository redisUserRegRepository;
 
     @Autowired
-    private TwilioSmsSender smsSender;
+    private SMSSender smsSender;
 
     @Autowired
     private OtpGenerator otpGenerator;
