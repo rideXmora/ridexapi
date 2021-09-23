@@ -103,4 +103,21 @@ public class JWTServiceTest {
         assertEquals(thrown.getMessage(), "Expired or invalid JWT token");
     }
 
+    @Test
+    @DisplayName("Get username")
+    void getUsername() {
+        String phone = "+94771101234";
+        Role role = Role.PASSENGER;
+        String token = jwtService.createToken(phone, role);
+        assertEquals(jwtService.getUsername(token), phone);
+    }
+
+    @Test
+    @DisplayName("Get role")
+    void getUserRole() {
+        String phone = "+94771101234";
+        Role role = Role.PASSENGER;
+        String token = jwtService.createToken(phone, role);
+        assertEquals(jwtService.getUserRole(token), role);
+    }
 }

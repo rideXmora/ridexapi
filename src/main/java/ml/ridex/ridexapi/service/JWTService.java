@@ -16,7 +16,6 @@ import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class JWTService {
@@ -50,6 +49,10 @@ public class JWTService {
 
     public String getUsername(String token) {
         return jwtParser.parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public Role getUserRole(String token) {
+        return Role.valueOf((String)jwtParser.parseClaimsJws(token).getBody().get("role"));
     }
 
     public String resolveToken(HttpServletRequest req) {
