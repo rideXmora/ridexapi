@@ -19,6 +19,7 @@ public class TwilioSmsSender implements SMSSender{
 
     @Override
     public void sendSms(String phone, String message) {
+        System.out.println(twilioConfig.getPhone());
         PhoneNumber from = new PhoneNumber(twilioConfig.getPhone());
         PhoneNumber to = new PhoneNumber(phone);
         MessageCreator creator = Message.creator(to, from, message);
