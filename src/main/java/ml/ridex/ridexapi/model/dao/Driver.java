@@ -19,8 +19,6 @@ public class Driver {
     @Indexed(unique = true)
     private String phone;
 
-    private String refreshToken;
-
     private String email;
 
     private String name;
@@ -40,7 +38,6 @@ public class Driver {
     private Boolean suspend;
 
     public Driver(String phone,
-                     String refreshToken,
                      String email,
                      String name,
                      Integer totalRating,
@@ -51,7 +48,6 @@ public class Driver {
                      Boolean suspend,
                      Boolean enabled) {
         this.phone = phone;
-        this.refreshToken = refreshToken;
         this.email = email;
         this.name = name;
         this.totalRating = totalRating;
