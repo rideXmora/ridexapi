@@ -22,7 +22,7 @@ import javax.validation.Valid;
 import java.security.InvalidKeyException;
 
 @RestController
-@RequestMapping("/api/auth/passenger")
+@RequestMapping("/api/auth")
 @Tag(name="Passenger Authentication")
 public class AuthPassengerController {
     @Autowired
@@ -31,7 +31,7 @@ public class AuthPassengerController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @PostMapping("/phoneAuth")
+    @PostMapping("/passenger/phoneAuth")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Passenger/signup Send OTP")
     @ApiResponses(value = {
@@ -40,7 +40,7 @@ public class AuthPassengerController {
     })
     public String passengerPhoneAuth(@Valid @RequestBody PhoneAuthDTO phoneAuthDTO) {
         try {
-            return authService.passengerPhoneAuth(phoneAuthDTO);
+            return authService.phoneAuth(phoneAuthDTO, Role.PASSENGER);
         } catch (InvalidKeyException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         } catch (InvalidOperationException e) {
