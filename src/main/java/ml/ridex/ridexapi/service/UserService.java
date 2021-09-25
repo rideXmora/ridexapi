@@ -9,6 +9,7 @@ import ml.ridex.ridexapi.helper.OtpGenerator;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.User;
+import ml.ridex.ridexapi.model.dto.AdminLoginResDTO;
 import ml.ridex.ridexapi.model.dto.DriverVerifiedResDTO;
 import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
 import ml.ridex.ridexapi.model.redis.UserReg;
@@ -179,6 +180,20 @@ public class UserService implements UserDetailsService {
         DriverVerifiedResDTO response = modelMapper.map(driver, DriverVerifiedResDTO.class);
         response.setToken(jwtService.createToken(phone, Arrays.asList(Role.DRIVER)));
         response.setRefreshToken(refreshToken);
+        return response;
+    }
+
+    public User adminSignup(String phone, String password) {
+        User user = new User(phone, passwordEncoder.encode(password), Arrays.asList(Role.RIDEX_ADMIN), 0, true);
+        return userRepository.save(user);
+    }
+
+    public AdminLoginResDTO adminLogin(String phone) {
+        User user = (User)loadUserByUsername(phone);
+        if (!user.isEnabled())
+            throw new EntityNotFoundException("User is suspended");
+        AdminLoginResDTO response = modelMapper.map(user, AdminLoginResDTO.class);
+        response.setToken(jwtService.createToken(phone, Arrays.asList(Role.RIDEX_ADMIN)));
         return response;
     }
 }
