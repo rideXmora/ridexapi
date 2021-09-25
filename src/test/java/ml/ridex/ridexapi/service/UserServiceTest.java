@@ -1,2 +1,169 @@
-package ml.ridex.ridexapi.service;public class userService {
+package ml.ridex.ridexapi.service;
+
+import ml.ridex.ridexapi.enums.Role;
+import ml.ridex.ridexapi.helper.OtpGenerator;
+import ml.ridex.ridexapi.model.dao.Driver;
+import ml.ridex.ridexapi.model.dao.Passenger;
+import ml.ridex.ridexapi.model.dao.User;
+import ml.ridex.ridexapi.model.dto.DriverVerifiedResDTO;
+import ml.ridex.ridexapi.model.dto.OtpVerifyDTO;
+import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
+import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
+import ml.ridex.ridexapi.model.redis.UserReg;
+import ml.ridex.ridexapi.repository.DriverRepository;
+import ml.ridex.ridexapi.repository.PassengerRepository;
+import ml.ridex.ridexapi.repository.RedisUserRegRepository;
+import ml.ridex.ridexapi.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.security.InvalidKeyException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest {
+    UserService userService;
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    PassengerRepository passengerRepository;
+    @Mock
+    DriverRepository driverRepository;
+    @Mock
+    RedisUserRegRepository redisUserRegRepository;
+    @Mock
+    SMSSender smsSender;
+    @Mock
+    EmailSender emailSender;
+    @Spy
+    OtpGenerator otpGenerator;
+    @Mock
+    JWTService jwtService;
+    @Spy
+    PasswordEncoder passwordEncoder;
+    @Spy
+    ModelMapper modelMapper;
+
+    User userPassenger;
+    User userDriver;
+    Passenger passenger;
+    Driver driver;
+    UserReg userRegPassenger;
+    UserReg userRegDriver;
+
+    @BeforeEach
+    void setup() {
+        userService = new UserService();
+        userPassenger = new User("+94714461798", "password", Arrays.asList(Role.PASSENGER), Instant.now().getEpochSecond()+100000, true);
+        userDriver = new User("+94714461798", "password", Arrays.asList(Role.DRIVER), Instant.now().getEpochSecond()+100000, true);
+        passenger = new Passenger("94714461798", null, null, 0, 0, new ArrayList<>(), false,true);
+        driver = new Driver("94714461798", null, null, 0, 0, new ArrayList<>(), null, null,false,true);
+        userRegPassenger = new UserReg("+94714461798", Role.PASSENGER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
+        userRegDriver = new UserReg("+94714461798", Role.DRIVER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
+
+        ReflectionTestUtils.setField(userService, "redisUserRegRepository", redisUserRegRepository);
+        ReflectionTestUtils.setField(userService, "passengerRepository", passengerRepository);
+        ReflectionTestUtils.setField(userService, "driverRepository", driverRepository);
+        ReflectionTestUtils.setField(userService, "userRepository", userRepository);
+        ReflectionTestUtils.setField(userService, "otpGenerator", otpGenerator);
+        ReflectionTestUtils.setField(userService, "jwtService", jwtService);
+        ReflectionTestUtils.setField(userService, "smsSender", smsSender);
+        ReflectionTestUtils.setField(userService, "emailSender", emailSender);
+        ReflectionTestUtils.setField(userService, "passwordEncoder", passwordEncoder);
+        ReflectionTestUtils.setField(userService, "modelMapper", modelMapper);
+    }
+
+    @Test
+    @DisplayName("Passenger sing up successfully")
+    void phoneAuth() throws InvalidKeyException {
+        PhoneAuthDTO phoneAuthDTO = new PhoneAuthDTO("+94714461798");
+
+        when(redisUserRegRepository.save(any(UserReg.class))).thenReturn(userRegPassenger);
+        doNothing().when(smsSender).sendSms(anyString(), anyString());
+
+        String response = userService.sendOTP(phoneAuthDTO.getPhone(),Role.PASSENGER);
+        assertThat(response).isEqualTo("OTP is sent");
+    }
+
+    @Test
+    @DisplayName("Passenger OTP verification successfully/with reg")
+    void passengerVerify() {
+        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
+        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(userPassenger));
+        when(passengerRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(passenger));
+        when(userRepository.save(any(User.class))).thenReturn(userPassenger);
+
+        PassengerVerifiedResDTO response = userService.passengerVerification(dto.getPhone(), dto.getOtp());
+
+        assertThat(response.getRefreshToken()).asString();
+    }
+
+    @Test
+    @DisplayName("Passenger OTP verification successfully")
+    void passengerSignupVerify() {
+        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
+        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(null));
+        when(userRepository.save(any(User.class))).thenReturn(userPassenger);
+        when(passengerRepository.save(any(Passenger.class))).thenReturn(passenger);
+
+        PassengerVerifiedResDTO response = userService.passengerVerification(dto.getPhone(), dto.getOtp());
+
+        assertThat(response.getRefreshToken()).asString();
+    }
+
+    @Test
+    @DisplayName("Driver OTP verification successfully/with reg")
+    void driverVerify() {
+        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
+        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(userDriver));
+        when(driverRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(driver));
+        when(userRepository.save(any(User.class))).thenReturn(userDriver);
+
+        DriverVerifiedResDTO response = userService.driverVerification(dto.getPhone(), dto.getOtp());
+
+        assertThat(response.getRefreshToken()).asString();
+    }
+
+    @Test
+    @DisplayName("Passenger OTP verification successfully")
+    void driverSignupVerify() {
+        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
+        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(null));
+        when(userRepository.save(any(User.class))).thenReturn(userDriver);
+        when(driverRepository.save(any(Driver.class))).thenReturn(driver);
+
+        DriverVerifiedResDTO response = userService.driverVerification(dto.getPhone(), dto.getOtp());
+
+        assertThat(response.getRefreshToken()).asString();
+    }
+
+    @Test
+    @DisplayName("Return Authentication object")
+    void getAuthentication() {
+        String phone = "+94714461798";
+        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userPassenger));
+
+        assertThat(userService.getAuthentication(phone)).isNotNull();
+    }
 }
