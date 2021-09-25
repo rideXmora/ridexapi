@@ -66,10 +66,10 @@ public class User implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-//        if(password == null || password =="")
-//            return false;
-//        if(enabled && (role == Role.DRIVER || role == Role.PASSENGER))
-//            return exp > Instant.now().getEpochSecond();
+        if(password == null || password =="")
+            return false;
+        if(enabled && (roles.contains(Role.DRIVER)  || roles.contains(Role.PASSENGER)))
+            return exp > Instant.now().getEpochSecond();
         return enabled;
     }
 
