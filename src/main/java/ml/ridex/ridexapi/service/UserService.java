@@ -7,6 +7,7 @@ import ml.ridex.ridexapi.helper.CustomHash;
 import ml.ridex.ridexapi.helper.Otp;
 import ml.ridex.ridexapi.helper.OtpGenerator;
 import ml.ridex.ridexapi.model.dao.Driver;
+import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.User;
 import ml.ridex.ridexapi.model.dto.AdminLoginResDTO;
@@ -16,6 +17,7 @@ import ml.ridex.ridexapi.model.redis.UserReg;
 import ml.ridex.ridexapi.repository.DriverRepository;
 import ml.ridex.ridexapi.repository.PassengerRepository;
 import ml.ridex.ridexapi.repository.RedisUserRegRepository;
+import ml.ridex.ridexapi.repository.OrgAdminRepository;
 import ml.ridex.ridexapi.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private RedisUserRegRepository redisUserRegRepository;
+
+    @Autowired
+    private OrgAdminRepository orgAdminRepository;
 
     @Autowired
     private JWTService jwtService;
@@ -94,8 +99,8 @@ public class UserService implements UserDetailsService {
         Otp otp = otpGenerator.generateOTP();
         CustomHash otpHash = new CustomHash(otp.getOtp());
         this.redisSaveService(phone, role, otpHash.getTxtHash(), otp.getExp());
-        smsSender.sendSms(phone, otp.getOtp());
-        // System.out.println(otp.getOtp());
+        // smsSender.sendSms(phone, otp.getOtp());
+        System.out.println(otp.getOtp());
         return "OTP is sent";
     }
 
@@ -195,5 +200,26 @@ public class UserService implements UserDetailsService {
         AdminLoginResDTO response = modelMapper.map(user, AdminLoginResDTO.class);
         response.setToken(jwtService.createToken(phone, Arrays.asList(Role.RIDEX_ADMIN)));
         return response;
+    }
+
+    public OrgAdmin orgAdminSignup(String name,
+                               String email,
+                               String password,
+                               String phone,
+                               String businessRegNo,
+                               String basedCity,
+                               String address) {
+
+        User user = createUser(phone, password, Arrays.asList(Role.ORG_ADMIN), true);
+        OrgAdmin orgAdminData = new OrgAdmin(
+                name,
+                phone,
+                email,
+                businessRegNo,
+                basedCity,
+                address,
+                false,
+                true);
+        return orgAdminRepository.save(orgAdminData);
     }
 }
