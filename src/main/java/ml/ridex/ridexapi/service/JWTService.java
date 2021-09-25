@@ -17,6 +17,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class JWTService {
@@ -34,9 +35,10 @@ public class JWTService {
         jwtParser = Jwts.parserBuilder().setSigningKey(publicKey).build();
     }
 
-    public String createToken(String phone, Role role) {
+    public String createToken(String phone, List<Role> roles) {
+        List<String> rolesStr = roles.stream().map(role -> role.name()).collect(Collectors.toList());
         Claims claims = Jwts.claims().setSubject(phone);
-        claims.put("role", role.name());
+        claims.put("roles", rolesStr);
         claims.put("type", "auth");
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
@@ -63,7 +65,6 @@ public class JWTService {
     public boolean validateToken(String token) {
         try {
             Jws<Claims> claims = jwtParser.parseClaimsJws(token);
-            //Integer userId = Integer.parseInt(claims.getBody().getSubject());
             Boolean isTokenValid = !claims.getBody().getExpiration().before(new Date());
             return isTokenValid;
         } catch (JwtException | IllegalArgumentException e) {

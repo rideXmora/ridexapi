@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class User implements UserDetails {
@@ -20,23 +22,26 @@ public class User implements UserDetails {
 
     private String password;
 
-    private Role role;
+    private List<Role> roles;
+
+    private Collection<? extends GrantedAuthority> authorities;
 
     private long exp;
 
     private Boolean enabled;
 
-    public User(String phone, String password, Role role, long exp, Boolean enabled) {
+    public User(String phone, String password, List<Role> roles, long exp, Boolean enabled) {
         this.phone = phone;
         this.password = password;
-        this.role = role;
+        this.roles = roles;
         this.exp = exp;
         this.enabled = enabled;
+        this.authorities = roles.stream().map(role -> new SimpleGrantedAuthority(role.name())).collect(Collectors.toList());
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(role.name()));
+        return authorities;
     }
 
     @Override

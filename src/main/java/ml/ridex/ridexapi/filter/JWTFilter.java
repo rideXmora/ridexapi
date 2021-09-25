@@ -33,8 +33,8 @@ public class JWTFilter extends GenericFilterBean {
             if (token != null && jwtService.validateToken(token)) {
                 Authentication auth;
                 if (token != null) {
-                    String userId = jwtService.getUsername(token);
-                    auth = userService.getAuthentication(userId);
+                    String phone = jwtService.getUsername(token);
+                    auth = userService.getAuthentication(phone);
                 } else {
                     auth = null;
                 }

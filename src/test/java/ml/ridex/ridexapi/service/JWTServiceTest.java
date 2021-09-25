@@ -20,6 +20,7 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -46,7 +47,7 @@ public class JWTServiceTest {
     void createTokenShouldReturnToken() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         String phone = "+94772597206";
         Role role = Role.PASSENGER;
-        String token = jwtService.createToken(phone, role);
+        String token = jwtService.createToken(phone, Arrays.asList(role));
 
         // check claims
         byte[] keyBytes = new PemReader(new StringReader(publicKeyPath)).readPemObject().getContent();
@@ -91,7 +92,7 @@ public class JWTServiceTest {
     void validateTokenShouldValidate() {
         String phone = "+94771101234";
         Role role = Role.PASSENGER;
-        String token = jwtService.createToken(phone, role);
+        String token = jwtService.createToken(phone, Arrays.asList(role));
         assertThat(jwtService.validateToken(token)).isTrue();
     }
 

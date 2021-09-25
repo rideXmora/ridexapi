@@ -32,6 +32,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -110,11 +112,11 @@ public class UserService implements UserDetailsService {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public User createUser(String phone, String password, Role role, boolean enable) {
+    public User createUser(String phone, String password, List<Role> roles, boolean enable) {
         User user = new User(
                 phone,
                 passwordEncoder.encode(password),
-                role,
+                roles,
                 Instant.now().getEpochSecond() + REFRESH_TOKEN_VALIDITY,
                 enable);
         return userRepository.save(user);
@@ -132,7 +134,7 @@ public class UserService implements UserDetailsService {
             user.setPassword(passwordEncoder.encode(refreshToken));
             userRepository.save(user);
         } catch (EntityNotFoundException e) {
-            user = this.createUser(phone, refreshToken, Role.PASSENGER, true);
+            user = this.createUser(phone, refreshToken, Arrays.asList(Role.PASSENGER), true);
             passenger = passengerRepository.save(new Passenger(
                     phone,
                     null,
@@ -145,7 +147,7 @@ public class UserService implements UserDetailsService {
             ));
         }
         PassengerVerifiedResDTO response = modelMapper.map(passenger, PassengerVerifiedResDTO.class);
-        response.setToken(jwtService.createToken(phone, Role.PASSENGER));
+        response.setToken(jwtService.createToken(phone, Arrays.asList(Role.PASSENGER)));
         response.setRefreshToken(refreshToken);
         return response;
     }
@@ -162,7 +164,7 @@ public class UserService implements UserDetailsService {
             user.setPassword(passwordEncoder.encode(refreshToken));
             userRepository.save(user);
         } catch (EntityNotFoundException e) {
-            user = this.createUser(phone, refreshToken, Role.DRIVER, true);
+            user = this.createUser(phone, refreshToken, Arrays.asList(Role.DRIVER), true);
             driver = driverRepository.save(new Driver(phone,
                     null,
                     null,
@@ -175,7 +177,7 @@ public class UserService implements UserDetailsService {
                     true));
         }
         DriverVerifiedResDTO response = modelMapper.map(driver, DriverVerifiedResDTO.class);
-        response.setToken(jwtService.createToken(phone, Role.DRIVER));
+        response.setToken(jwtService.createToken(phone, Arrays.asList(Role.DRIVER)));
         response.setRefreshToken(refreshToken);
         return response;
     }
