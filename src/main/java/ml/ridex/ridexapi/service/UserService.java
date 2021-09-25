@@ -12,6 +12,7 @@ import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.User;
 import ml.ridex.ridexapi.model.dto.AdminLoginResDTO;
 import ml.ridex.ridexapi.model.dto.DriverVerifiedResDTO;
+import ml.ridex.ridexapi.model.dto.OrgAdminLoginResDTO;
 import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
 import ml.ridex.ridexapi.model.redis.UserReg;
 import ml.ridex.ridexapi.repository.DriverRepository;
@@ -221,5 +222,15 @@ public class UserService implements UserDetailsService {
                 false,
                 true);
         return orgAdminRepository.save(orgAdminData);
+    }
+
+    public OrgAdminLoginResDTO orgAdminLogin(String phone) {
+        User user = (User)loadUserByUsername(phone);
+        if (!user.isEnabled())
+            throw new EntityNotFoundException("User is suspended");
+        OrgAdmin orgAdmin = orgAdminRepository.findByPhone(phone).get();
+        OrgAdminLoginResDTO response = modelMapper.map(orgAdmin, OrgAdminLoginResDTO.class);
+        response.setToken(jwtService.createToken(phone, Arrays.asList(Role.ORG_ADMIN)));
+        return response;
     }
 }

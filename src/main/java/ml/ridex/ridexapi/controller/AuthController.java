@@ -12,6 +12,7 @@ import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
 import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
 import ml.ridex.ridexapi.model.dto.AdminDTO;
 import ml.ridex.ridexapi.model.dto.AdminLoginResDTO;
+import ml.ridex.ridexapi.model.dto.OrgAdminLoginResDTO;
 import ml.ridex.ridexapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -93,6 +94,24 @@ public class AuthController {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.getPhone(), data.getPassword()));
             return userService.adminLogin(data.getPhone());
 
+        } catch (AuthenticationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @PostMapping("/orgAdmin/login")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Org admin login")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "Invalid phone/password")
+    })
+    public OrgAdminLoginResDTO orgAdminLogin(@Valid @RequestBody AdminDTO data) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.getPhone(), data.getPassword()));
+            return userService.orgAdminLogin(data.getPhone());
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
         } catch (EntityNotFoundException e) {
