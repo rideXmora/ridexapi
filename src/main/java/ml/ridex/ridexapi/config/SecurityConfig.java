@@ -1,6 +1,7 @@
 package ml.ridex.ridexapi.config;
 
 import ml.ridex.ridexapi.service.JWTService;
+import ml.ridex.ridexapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -8,12 +9,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 import java.util.List;
 
 @Configuration
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(
         prePostEnabled = true,
         securedEnabled = true,
@@ -22,6 +25,8 @@ import java.util.List;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JWTService jwtService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     @Value("${ALLOWED_ORIGIN}")
@@ -54,6 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/swagger-ui/*"
                 ).permitAll()
                 .anyRequest().authenticated()
+                .and()
+                .apply(new JwtConfigurer(jwtService, userService))
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint);

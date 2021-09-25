@@ -36,7 +36,7 @@ public class JWTService {
 
     public String createToken(String phone, Role role) {
         Claims claims = Jwts.claims().setSubject(phone);
-        claims.put("role", role);
+        claims.put("role", role.name());
         claims.put("type", "auth");
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
