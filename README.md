@@ -8,5 +8,3 @@
 ###API documentation - 
 * local - http://localhost:8080/swagger-ui.html
 * hosted - http://ridex.ml/api/swagger-ui.html
-
-** Need to create unique index in User collection  db.user.createIndex({"phone":1}, {unique:true}); **
