@@ -99,8 +99,8 @@ public class UserService implements UserDetailsService {
         Otp otp = otpGenerator.generateOTP();
         CustomHash otpHash = new CustomHash(otp.getOtp());
         this.redisSaveService(phone, role, otpHash.getTxtHash(), otp.getExp());
-        // smsSender.sendSms(phone, otp.getOtp());
-        System.out.println(otp.getOtp());
+        smsSender.sendSms(phone, otp.getOtp());
+        // System.out.println(otp.getOtp());
         return "OTP is sent";
     }
 
