@@ -6,7 +6,6 @@ import ml.ridex.ridexapi.config.SendGridConfig;
 import ml.ridex.ridexapi.model.dto.EmailResponseDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
