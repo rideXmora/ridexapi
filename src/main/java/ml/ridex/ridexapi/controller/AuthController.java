@@ -68,6 +68,21 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/driver/phoneAuth")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Send OTP/driver")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Saved user in memory"),
+            @ApiResponse(responseCode = "500", description = "Unable to generate OTP")
+    })
+    public String driverPhoneAuth(@Valid @RequestBody PhoneAuthDTO data) {
+        try {
+            return userService.sendOTP(data.getPhone(), Role.DRIVER);
+        } catch (InvalidKeyException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
     @PostMapping("/driver/phoneVerify")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Verify OTP/driver")
