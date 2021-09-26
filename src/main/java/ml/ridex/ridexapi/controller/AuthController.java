@@ -3,6 +3,7 @@ package ml.ridex.ridexapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
@@ -27,6 +28,7 @@ import java.security.InvalidKeyException;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication APIs")
 public class AuthController {
 
     @Autowired
