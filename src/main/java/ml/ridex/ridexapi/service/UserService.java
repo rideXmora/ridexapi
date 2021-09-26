@@ -7,14 +7,18 @@ import ml.ridex.ridexapi.helper.CustomHash;
 import ml.ridex.ridexapi.helper.Otp;
 import ml.ridex.ridexapi.helper.OtpGenerator;
 import ml.ridex.ridexapi.model.dao.Driver;
+import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.User;
+import ml.ridex.ridexapi.model.dto.AdminLoginResDTO;
 import ml.ridex.ridexapi.model.dto.DriverVerifiedResDTO;
+import ml.ridex.ridexapi.model.dto.OrgAdminLoginResDTO;
 import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
 import ml.ridex.ridexapi.model.redis.UserReg;
 import ml.ridex.ridexapi.repository.DriverRepository;
 import ml.ridex.ridexapi.repository.PassengerRepository;
 import ml.ridex.ridexapi.repository.RedisUserRegRepository;
+import ml.ridex.ridexapi.repository.OrgAdminRepository;
 import ml.ridex.ridexapi.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +53,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private RedisUserRegRepository redisUserRegRepository;
+
+    @Autowired
+    private OrgAdminRepository orgAdminRepository;
 
     @Autowired
     private JWTService jwtService;
@@ -179,6 +186,51 @@ public class UserService implements UserDetailsService {
         DriverVerifiedResDTO response = modelMapper.map(driver, DriverVerifiedResDTO.class);
         response.setToken(jwtService.createToken(phone, Arrays.asList(Role.DRIVER)));
         response.setRefreshToken(refreshToken);
+        return response;
+    }
+
+    public User adminSignup(String phone, String password) {
+        User user = new User(phone, passwordEncoder.encode(password), Arrays.asList(Role.RIDEX_ADMIN), 0, true);
+        return userRepository.save(user);
+    }
+
+    public AdminLoginResDTO adminLogin(String phone) {
+        User user = (User)loadUserByUsername(phone);
+        if (!user.isEnabled())
+            throw new EntityNotFoundException("User is suspended");
+        AdminLoginResDTO response = modelMapper.map(user, AdminLoginResDTO.class);
+        response.setToken(jwtService.createToken(phone, Arrays.asList(Role.RIDEX_ADMIN)));
+        return response;
+    }
+
+    public OrgAdmin orgAdminSignup(String name,
+                               String email,
+                               String password,
+                               String phone,
+                               String businessRegNo,
+                               String basedCity,
+                               String address) {
+
+        User user = createUser(phone, password, Arrays.asList(Role.ORG_ADMIN), true);
+        OrgAdmin orgAdminData = new OrgAdmin(
+                name,
+                phone,
+                email,
+                businessRegNo,
+                basedCity,
+                address,
+                false,
+                true);
+        return orgAdminRepository.save(orgAdminData);
+    }
+
+    public OrgAdminLoginResDTO orgAdminLogin(String phone) {
+        User user = (User)loadUserByUsername(phone);
+        if (!user.isEnabled())
+            throw new EntityNotFoundException("User is suspended");
+        OrgAdmin orgAdmin = orgAdminRepository.findByPhone(phone).get();
+        OrgAdminLoginResDTO response = modelMapper.map(orgAdmin, OrgAdminLoginResDTO.class);
+        response.setToken(jwtService.createToken(phone, Arrays.asList(Role.ORG_ADMIN)));
         return response;
     }
 }

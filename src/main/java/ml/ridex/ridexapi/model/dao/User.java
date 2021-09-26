@@ -3,21 +3,23 @@ package ml.ridex.ridexapi.model.dao;
 import lombok.Data;
 import ml.ridex.ridexapi.enums.Role;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Document
 @Data
 public class User implements UserDetails {
     @Id
     private String id;
-
+    @Indexed(unique = true)
     private String phone;
 
     private String password;
