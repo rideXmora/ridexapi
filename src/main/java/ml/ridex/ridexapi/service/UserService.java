@@ -172,16 +172,21 @@ public class UserService implements UserDetailsService {
             userRepository.save(user);
         } catch (EntityNotFoundException e) {
             user = this.createUser(phone, refreshToken, Arrays.asList(Role.DRIVER), true);
-            driver = driverRepository.save(new Driver(phone,
+            driver = driverRepository.save(new Driver(
+                    phone,
                     null,
                     null,
+                    null,
+                    null,
+                    0,
+                    0,
                     0,
                     0,
                     new ArrayList<>(),
                     null,
                     null,
                     false,
-                    true));
+                    false));
         }
         DriverVerifiedResDTO response = modelMapper.map(driver, DriverVerifiedResDTO.class);
         response.setToken(jwtService.createToken(phone, Arrays.asList(Role.DRIVER)));
