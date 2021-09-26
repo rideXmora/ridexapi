@@ -1,9 +1,11 @@
 package ml.ridex.ridexapi.model.dto;
 
 import lombok.Data;
+import ml.ridex.ridexapi.model.daoHelper.DriverOrganization;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class DriverProfileComplete {
@@ -18,6 +20,6 @@ public class DriverProfileComplete {
     @NotBlank
     private String city;
 
-    @NotBlank
-    private String drivingLicense;
+    @NotNull
+    private DriverOrganization driverOrganization;
 }
