@@ -137,7 +137,10 @@ public class UserService implements UserDetailsService {
         String refreshToken = UUID.randomUUID().toString();
         try {
             user = (User)this.loadUserByUsername(phone);
-            passenger = passengerRepository.findByPhone(phone).get();
+            Optional<Passenger> passengerOptional = passengerRepository.findByPhone(phone);
+            if(passengerOptional.isEmpty())
+                throw new InvalidOperationException("Try another phone number"); // must change later
+            passenger = passengerOptional.get();
             user.setPassword(passwordEncoder.encode(refreshToken));
             userRepository.save(user);
         } catch (EntityNotFoundException e) {
@@ -167,7 +170,10 @@ public class UserService implements UserDetailsService {
         String refreshToken = UUID.randomUUID().toString();
         try {
             user = (User)this.loadUserByUsername(phone);
-            driver = driverRepository.findByPhone(phone).get();
+            Optional<Driver> driverOptional = driverRepository.findByPhone(phone);
+            if(driverOptional.isEmpty())
+                throw new InvalidOperationException("Try another phone number"); // must change later
+            driver = driverOptional.get();
             user.setPassword(passwordEncoder.encode(refreshToken));
             userRepository.save(user);
         } catch (EntityNotFoundException e) {
