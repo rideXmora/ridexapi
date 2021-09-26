@@ -1,6 +1,7 @@
 package ml.ridex.ridexapi.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.daoHelper.DriverOrganization;
 import ml.ridex.ridexapi.service.CommonService;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/common")
+@Tag(name = "Common APIs for logged users")
 public class CommonController {
 
     @Autowired

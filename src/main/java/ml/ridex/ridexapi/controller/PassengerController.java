@@ -3,6 +3,7 @@ package ml.ridex.ridexapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
@@ -22,6 +23,7 @@ import java.security.Principal;
 @RestController
 @PreAuthorize("hasAuthority('PASSENGER')")
 @RequestMapping("/api/passenger")
+@Tag(name = "Passenger APIs")
 public class PassengerController {
 
     @Autowired
