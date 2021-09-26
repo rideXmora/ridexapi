@@ -3,17 +3,12 @@ package ml.ridex.ridexapi.service;
 import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.helper.OtpGenerator;
 import ml.ridex.ridexapi.model.dao.Driver;
+import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.User;
-import ml.ridex.ridexapi.model.dto.DriverVerifiedResDTO;
-import ml.ridex.ridexapi.model.dto.OtpVerifyDTO;
-import ml.ridex.ridexapi.model.dto.PassengerVerifiedResDTO;
-import ml.ridex.ridexapi.model.dto.PhoneAuthDTO;
+import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.model.redis.UserReg;
-import ml.ridex.ridexapi.repository.DriverRepository;
-import ml.ridex.ridexapi.repository.PassengerRepository;
-import ml.ridex.ridexapi.repository.RedisUserRegRepository;
-import ml.ridex.ridexapi.repository.UserRepository;
+import ml.ridex.ridexapi.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,8 +27,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -46,6 +40,8 @@ public class UserServiceTest {
     PassengerRepository passengerRepository;
     @Mock
     DriverRepository driverRepository;
+    @Mock
+    OrgAdminRepository orgAdminRepository;
     @Mock
     RedisUserRegRepository redisUserRegRepository;
     @Mock
@@ -81,6 +77,7 @@ public class UserServiceTest {
         ReflectionTestUtils.setField(userService, "redisUserRegRepository", redisUserRegRepository);
         ReflectionTestUtils.setField(userService, "passengerRepository", passengerRepository);
         ReflectionTestUtils.setField(userService, "driverRepository", driverRepository);
+        ReflectionTestUtils.setField(userService, "orgAdminRepository", orgAdminRepository);
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
         ReflectionTestUtils.setField(userService, "otpGenerator", otpGenerator);
         ReflectionTestUtils.setField(userService, "jwtService", jwtService);
@@ -165,5 +162,48 @@ public class UserServiceTest {
         when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userPassenger));
 
         assertThat(userService.getAuthentication(phone)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Admin signup")
+    void adminSignup() {
+        String phone = "+94714461798";
+        String password = "password";
+        when(userRepository.save(any(User.class))).thenReturn(userPassenger);
+
+        assertThat(userService.adminSignup(phone, password).getPassword()).asString();
+    }
+
+    @Test
+    @DisplayName("Admin login")
+    void adminLogin() {
+        String phone = "+94714461798";
+        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userDriver));
+        when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
+        AdminLoginResDTO data = userService.adminLogin(phone);
+        assertThat(data.getToken()).asString();
+    }
+
+    @Test
+    @DisplayName("OrgAdmin signup/success")
+    void orgAdminSignup() {
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", false, true);
+        when(orgAdminRepository.save(any(OrgAdmin.class))).thenReturn(orgAdmin);
+
+        assertThat(userService.orgAdminSignup("ksr", "ksr@gmail.com","password","94714461798", "SF232","Kurunegala", "Adress").getEnabled()).isTrue();
+    }
+
+    @Test
+    @DisplayName("OrgAdmin login")
+    void orgAdminLogin() {
+        String phone = "+94714461798";
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", false, true);
+        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userDriver));
+        when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
+        when(orgAdminRepository.findByPhone(anyString())).thenReturn(Optional.of(orgAdmin));
+
+        OrgAdminLoginResDTO res = userService.orgAdminLogin(phone);
+
+        assertThat(res.getToken()).isEqualTo("Token");
     }
 }
