@@ -150,7 +150,7 @@ public class UserService implements UserDetailsService {
                     0,
                     new ArrayList<>(),
                     false,
-                    true
+                    false
             ));
         }
         PassengerVerifiedResDTO response = modelMapper.map(passenger, PassengerVerifiedResDTO.class);
