@@ -23,6 +23,14 @@ public class Driver {
 
     private String name;
 
+    private String city;
+
+    private String drivingLicense;
+
+    private Integer totalIncome;
+
+    private Integer sessionIncome;
+
     private Integer totalRating;
 
     private Integer totalRides;
@@ -37,25 +45,36 @@ public class Driver {
 
     private Boolean suspend;
 
-    public Driver(String phone,
-                     String email,
-                     String name,
-                     Integer totalRating,
-                     Integer totalRides,
-                     List<String> pastRides,
-                     Vehicle vehicle,
-                     DriverOrganization driverOrganization,
-                     Boolean suspend,
-                     Boolean enabled) {
+    public Driver(
+            String phone,
+            String email,
+            String name,
+            String city,
+            String drivingLicense,
+            Integer totalIncome,
+            Integer sessionIncome,
+            Integer totalRating,
+            Integer totalRides,
+            List<String> pastRides,
+            Vehicle vehicle,
+            DriverOrganization driverOrganization,
+            Boolean suspend,
+            Boolean enabled) {
         this.phone = phone;
         this.email = email;
         this.name = name;
+        this.city = city;
+        this.drivingLicense = drivingLicense;
         this.totalRating = totalRating;
+        this.totalIncome = totalIncome;
+        this.sessionIncome = sessionIncome;
         this.totalRides = totalRides;
         this.pastRides = pastRides;
         this.vehicle = vehicle;
         this.driverOrganization = driverOrganization;
-        this.suspend = suspend;
         this.enabled = enabled;
+        this.suspend = suspend;
     }
+
+
 }

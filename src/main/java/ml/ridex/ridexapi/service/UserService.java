@@ -137,7 +137,10 @@ public class UserService implements UserDetailsService {
         String refreshToken = UUID.randomUUID().toString();
         try {
             user = (User)this.loadUserByUsername(phone);
-            passenger = passengerRepository.findByPhone(phone).get();
+            Optional<Passenger> passengerOptional = passengerRepository.findByPhone(phone);
+            if(passengerOptional.isEmpty())
+                throw new InvalidOperationException("Try another phone number"); // must change later
+            passenger = passengerOptional.get();
             user.setPassword(passwordEncoder.encode(refreshToken));
             userRepository.save(user);
         } catch (EntityNotFoundException e) {
@@ -150,7 +153,7 @@ public class UserService implements UserDetailsService {
                     0,
                     new ArrayList<>(),
                     false,
-                    true
+                    false
             ));
         }
         PassengerVerifiedResDTO response = modelMapper.map(passenger, PassengerVerifiedResDTO.class);
@@ -167,21 +170,29 @@ public class UserService implements UserDetailsService {
         String refreshToken = UUID.randomUUID().toString();
         try {
             user = (User)this.loadUserByUsername(phone);
-            driver = driverRepository.findByPhone(phone).get();
+            Optional<Driver> driverOptional = driverRepository.findByPhone(phone);
+            if(driverOptional.isEmpty())
+                throw new InvalidOperationException("Try another phone number"); // must change later
+            driver = driverOptional.get();
             user.setPassword(passwordEncoder.encode(refreshToken));
             userRepository.save(user);
         } catch (EntityNotFoundException e) {
             user = this.createUser(phone, refreshToken, Arrays.asList(Role.DRIVER), true);
-            driver = driverRepository.save(new Driver(phone,
+            driver = driverRepository.save(new Driver(
+                    phone,
                     null,
                     null,
+                    null,
+                    null,
+                    0,
+                    0,
                     0,
                     0,
                     new ArrayList<>(),
                     null,
                     null,
                     false,
-                    true));
+                    false));
         }
         DriverVerifiedResDTO response = modelMapper.map(driver, DriverVerifiedResDTO.class);
         response.setToken(jwtService.createToken(phone, Arrays.asList(Role.DRIVER)));
