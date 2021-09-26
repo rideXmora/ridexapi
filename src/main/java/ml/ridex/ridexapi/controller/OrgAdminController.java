@@ -3,6 +3,7 @@ package ml.ridex.ridexapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @RestController
 @PreAuthorize("hasAuthority('ORG_ADMIN')")
 @RequestMapping("/api/orgAdmin")
+@Tag(name = "Org Admin APIs")
 public class OrgAdminController {
 
     @Autowired

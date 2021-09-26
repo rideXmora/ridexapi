@@ -21,6 +21,8 @@ import ml.ridex.ridexapi.repository.RedisUserRegRepository;
 import ml.ridex.ridexapi.repository.OrgAdminRepository;
 import ml.ridex.ridexapi.repository.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -78,6 +80,8 @@ public class UserService implements UserDetailsService {
     @Value("${REFRESH_TOKEN_VALIDITY}")
     private long REFRESH_TOKEN_VALIDITY;
 
+    private static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+
     private void redisSaveService(String phone, Role role, String otpHash, long exp) {
         redisUserRegRepository.save(new UserReg(phone, role, otpHash, exp));
     }
@@ -101,7 +105,7 @@ public class UserService implements UserDetailsService {
         CustomHash otpHash = new CustomHash(otp.getOtp());
         this.redisSaveService(phone, role, otpHash.getTxtHash(), otp.getExp());
         smsSender.sendSms(phone, otp.getOtp());
-        // System.out.println(otp.getOtp());
+        LOGGER.info(otp.getOtp());
         return "OTP is sent";
     }
 
