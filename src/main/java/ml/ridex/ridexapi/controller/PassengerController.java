@@ -8,7 +8,7 @@ import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dto.PassengerDTO;
-import ml.ridex.ridexapi.model.dto.PassengerProfileComplete;
+import ml.ridex.ridexapi.model.dto.PassengerProfileCompleteDTO;
 import ml.ridex.ridexapi.service.PassengerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +40,31 @@ public class PassengerController {
             @ApiResponse(responseCode = "400", description = "Database error"),
             @ApiResponse(responseCode = "401", description = "User is suspended")
     })
-    public PassengerDTO profileComplete(@Valid @RequestBody PassengerProfileComplete data, Principal principal) {
+    public PassengerDTO profileComplete(@Valid @RequestBody PassengerProfileCompleteDTO data, Principal principal) {
         try {
             Passenger passenger = passengerService.profileComplete(principal.getName(), data.getName(), data.getEmail());
             return modelMapper.map(passenger, PassengerDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @PutMapping("/profileUpdate")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Update profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated"),
+            @ApiResponse(responseCode = "400", description = "Database error"),
+            @ApiResponse(responseCode = "401", description = "User is suspended")
+    })
+    public PassengerDTO updateProfile(@Valid @RequestBody PassengerProfileCompleteDTO data, Principal principal) {
+        try {
+            return modelMapper.map(passengerService.updateProfile(
+                    principal.getName(),
+                    data.getName(),
+                    data.getEmail()), PassengerDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (InvalidOperationException e) {
