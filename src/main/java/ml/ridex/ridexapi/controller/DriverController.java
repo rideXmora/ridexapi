@@ -9,7 +9,8 @@ import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.daoHelper.Vehicle;
 import ml.ridex.ridexapi.model.dto.DriverDTO;
-import ml.ridex.ridexapi.model.dto.DriverProfileComplete;
+import ml.ridex.ridexapi.model.dto.DriverProfileCompleteDTO;
+import ml.ridex.ridexapi.model.dto.DriverProfileUpdateDTO;
 import ml.ridex.ridexapi.service.DriverService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class DriverController {
             @ApiResponse(responseCode = "400", description = "User not found"),
             @ApiResponse(responseCode = "401", description = "User is suspended")
     })
-    public DriverDTO profileComplete(@Valid @RequestBody DriverProfileComplete data, Principal principal) {
+    public DriverDTO profileComplete(@Valid @RequestBody DriverProfileCompleteDTO data, Principal principal) {
         try {
             Driver driver = driverService.profileComplete(principal.getName(), data.getName(), data.getEmail(), data.getCity(), data.getDriverOrganization());
             return modelMapper.map(driver, DriverDTO.class);
@@ -64,6 +65,25 @@ public class DriverController {
         try {
            Driver driver = driverService.addVehicle(principal.getName(), data);
            return modelMapper.map(driver, DriverDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @PutMapping("/profileUpdate")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Driver profile update")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated"),
+            @ApiResponse(responseCode = "400", description = "User not found"),
+            @ApiResponse(responseCode = "401", description = "User is suspended")
+    })
+    public DriverDTO profileUpdate(@Valid @RequestBody DriverProfileUpdateDTO data, Principal principal) {
+        try {
+            Driver driver = driverService.profileUpdate(principal.getName(), data.getCity());
+            return modelMapper.map(driver, DriverDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (InvalidOperationException e) {

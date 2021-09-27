@@ -47,4 +47,12 @@ public class DriverService {
         driver.setVehicle(vehicle);
         return driverRepository.save(driver);
     }
+
+    public Driver profileUpdate(String phone, String city) throws EntityNotFoundException {
+        Driver driver = getDriver(phone);
+        if(driver.getSuspend())
+            throw new InvalidOperationException("User is suspended");
+        driver.setCity(city);
+        return driverRepository.save(driver);
+    }
 }
