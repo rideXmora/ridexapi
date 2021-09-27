@@ -1,5 +1,6 @@
 package ml.ridex.ridexapi.service;
 
+import com.twilio.exception.ApiException;
 import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
@@ -104,7 +105,11 @@ public class UserService implements UserDetailsService {
         Otp otp = otpGenerator.generateOTP();
         CustomHash otpHash = new CustomHash(otp.getOtp());
         this.redisSaveService(phone, role, otpHash.getTxtHash(), otp.getExp());
-        smsSender.sendSms(phone, otp.getOtp());
+        try {
+            smsSender.sendSms(phone, otp.getOtp());
+        } catch (ApiException e) {
+            // do nothing
+        }
         LOGGER.info(otp.getOtp());
         return "OTP is sent";
     }
