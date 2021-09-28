@@ -104,7 +104,7 @@ public class UserServiceTest {
     void passengerVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
-        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(userPassenger));
+        when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(userPassenger));
         when(passengerRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(passenger));
         when(userRepository.save(any(User.class))).thenReturn(userPassenger);
 
@@ -118,7 +118,7 @@ public class UserServiceTest {
     void passengerSignupVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
-        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(null));
+        when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(null));
         when(userRepository.save(any(User.class))).thenReturn(userPassenger);
         when(passengerRepository.save(any(Passenger.class))).thenReturn(passenger);
 
@@ -132,7 +132,7 @@ public class UserServiceTest {
     void driverVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
-        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(userDriver));
+        when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(userDriver));
         when(driverRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(driver));
         when(userRepository.save(any(User.class))).thenReturn(userDriver);
 
@@ -146,7 +146,7 @@ public class UserServiceTest {
     void driverSignupVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
-        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(null));
+        when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(null));
         when(userRepository.save(any(User.class))).thenReturn(userDriver);
         when(driverRepository.save(any(Driver.class))).thenReturn(driver);
 
@@ -159,7 +159,7 @@ public class UserServiceTest {
     @DisplayName("Return Authentication object")
     void getAuthentication() {
         String phone = "+94714461798";
-        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userPassenger));
+        when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userPassenger));
 
         assertThat(userService.getAuthentication(phone)).isNotNull();
     }
@@ -178,7 +178,7 @@ public class UserServiceTest {
     @DisplayName("Admin login")
     void adminLogin() {
         String phone = "+94714461798";
-        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userDriver));
+        when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userDriver));
         when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
         AdminLoginResDTO data = userService.adminLogin(phone);
         assertThat(data.getToken()).asString();
@@ -198,7 +198,7 @@ public class UserServiceTest {
     void orgAdminLogin() {
         String phone = "+94714461798";
         OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
-        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userDriver));
+        when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userDriver));
         when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
         when(orgAdminRepository.findByPhone(anyString())).thenReturn(Optional.of(orgAdmin));
 
