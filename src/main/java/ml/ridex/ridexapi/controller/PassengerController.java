@@ -7,8 +7,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
+import ml.ridex.ridexapi.model.dao.RideRequest;
 import ml.ridex.ridexapi.model.dto.PassengerDTO;
 import ml.ridex.ridexapi.model.dto.PassengerProfileCompleteDTO;
+import ml.ridex.ridexapi.model.dto.RideRequestDTO;
+import ml.ridex.ridexapi.model.dto.RideRequestResDTO;
 import ml.ridex.ridexapi.service.PassengerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +68,29 @@ public class PassengerController {
                     principal.getName(),
                     data.getName(),
                     data.getEmail()), PassengerDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @PostMapping("/ride/request")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create ride request")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Request created"),
+            @ApiResponse(responseCode = "400", description = "Database error"),
+            @ApiResponse(responseCode = "401", description = "User is suspended")
+    })
+    public RideRequestResDTO createRideRequest(@Valid @RequestBody RideRequestDTO data, Principal principal) {
+        try {
+            RideRequest rideRequest =passengerService.createRideRequest(
+                    principal.getName(),
+                    data.getStartLocation(),
+                    data.getEndLocation(),
+                    data.getDistance());
+            return modelMapper.map(rideRequest, RideRequestResDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (InvalidOperationException e) {
