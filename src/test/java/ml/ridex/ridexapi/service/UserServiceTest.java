@@ -67,10 +67,10 @@ public class UserServiceTest {
     @BeforeEach
     void setup() {
         userService = new UserService();
-        userPassenger = new User("+94714461798", "password", Arrays.asList(Role.PASSENGER), Instant.now().getEpochSecond()+100000, true);
-        userDriver = new User("+94714461798", "password", Arrays.asList(Role.DRIVER), Instant.now().getEpochSecond()+100000, true);
-        passenger = new Passenger("94714461798", null, null, 0, 0, new ArrayList<>(), false,true);
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null,false,false);
+        userPassenger = new User("+94714461798", "password", Arrays.asList(Role.PASSENGER), Instant.now().getEpochSecond()+100000, true, false);
+        userDriver = new User("+94714461798", "password", Arrays.asList(Role.DRIVER), Instant.now().getEpochSecond()+100000, true, false);
+        passenger = new Passenger("94714461798", null, null, 0, 0, new ArrayList<>(),true);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null,false);
         userRegPassenger = new UserReg("+94714461798", Role.PASSENGER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
         userRegDriver = new UserReg("+94714461798", Role.DRIVER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
 
@@ -187,7 +187,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("OrgAdmin signup/success")
     void orgAdminSignup() {
-        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", false, true);
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
         when(orgAdminRepository.save(any(OrgAdmin.class))).thenReturn(orgAdmin);
 
         assertThat(userService.orgAdminSignup("ksr", "ksr@gmail.com","password","94714461798", "SF232","Kurunegala", "Adress").getEnabled()).isTrue();
@@ -197,7 +197,7 @@ public class UserServiceTest {
     @DisplayName("OrgAdmin login")
     void orgAdminLogin() {
         String phone = "+94714461798";
-        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", false, true);
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
         when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userDriver));
         when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
         when(orgAdminRepository.findByPhone(anyString())).thenReturn(Optional.of(orgAdmin));

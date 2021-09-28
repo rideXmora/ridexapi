@@ -134,7 +134,8 @@ public class UserService implements UserDetailsService {
                 passwordEncoder.encode(password),
                 roles,
                 Instant.now().getEpochSecond() + REFRESH_TOKEN_VALIDITY,
-                enable);
+                enable,
+                false);
         return userRepository.save(user);
     }
 
@@ -161,7 +162,6 @@ public class UserService implements UserDetailsService {
                     0,
                     0,
                     new ArrayList<>(),
-                    false,
                     false
             ));
         }
@@ -200,7 +200,6 @@ public class UserService implements UserDetailsService {
                     new ArrayList<>(),
                     null,
                     null,
-                    false,
                     false));
         }
         DriverVerifiedResDTO response = modelMapper.map(driver, DriverVerifiedResDTO.class);
@@ -210,7 +209,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User adminSignup(String phone, String password) {
-        User user = new User(phone, passwordEncoder.encode(password), Arrays.asList(Role.RIDEX_ADMIN), 0, true);
+        User user = new User(phone, passwordEncoder.encode(password), Arrays.asList(Role.RIDEX_ADMIN), 0, true, false);
         return userRepository.save(user);
     }
 
@@ -239,7 +238,6 @@ public class UserService implements UserDetailsService {
                 businessRegNo,
                 basedCity,
                 address,
-                false,
                 true);
         return orgAdminRepository.save(orgAdminData);
     }

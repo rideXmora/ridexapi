@@ -30,8 +30,6 @@ public class DriverService {
             String city,
             DriverOrganization driverOrganization) throws EntityNotFoundException {
         Driver driver = getDriver(phone);
-        if(driver.getSuspend())
-            throw new InvalidOperationException("User is suspended");
         driver.setEmail(email);
         driver.setName(name);
         driver.setCity(city);
@@ -42,16 +40,12 @@ public class DriverService {
 
     public Driver addVehicle(String phone, Vehicle vehicle) throws EntityNotFoundException {
         Driver driver = getDriver(phone);
-        if(driver.getSuspend())
-            throw new InvalidOperationException("User is suspended");
         driver.setVehicle(vehicle);
         return driverRepository.save(driver);
     }
 
     public Driver profileUpdate(String phone, String city) throws EntityNotFoundException {
         Driver driver = getDriver(phone);
-        if(driver.getSuspend())
-            throw new InvalidOperationException("User is suspended");
         driver.setCity(city);
         return driverRepository.save(driver);
     }

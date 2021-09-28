@@ -28,8 +28,6 @@ public class PassengerService {
         if(passengerOptional.isEmpty())
             throw new EntityNotFoundException("User not found");
         Passenger passenger = passengerOptional.get();
-        if(passenger.getSuspend())
-            throw new InvalidOperationException("User is suspended");
         return passenger;
     }
 
@@ -58,7 +56,7 @@ public class PassengerService {
                 passenger.getId(),
                 passenger.getPhone(),
                 passenger.getName(),
-                (float) (passenger.getTotalRating()/totalRides));
+                (double) (passenger.getTotalRating()/totalRides));
         RideRequest rideRequest = new RideRequest(
                 rideRequestPassenger,
                 startLocation,

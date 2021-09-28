@@ -42,7 +42,7 @@ class PassengerServiceTest {
     @BeforeEach
     void setUp() {
         passengerService = new PassengerService();
-        passenger = new Passenger("94714461798", null, null, 0, 0, new ArrayList<>(), false,true);
+        passenger = new Passenger("94714461798", null, null, 0, 0, new ArrayList<>(),true);
         phone = "+94714461798";
 
         ReflectionTestUtils.setField(passengerService, "passengerRepository", passengerRepository);
@@ -64,15 +64,6 @@ class PassengerServiceTest {
         when(passengerRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(null));
         assertThatThrownBy(()-> passengerService.profileComplete(phone, "ksr@gmail.com", "ksr"))
                 .isInstanceOf(EntityNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("Profile compete suspend user")
-    void profileCompleteSuspendUser() {
-        passenger.setSuspend(true);
-        when(passengerRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(passenger));
-        assertThatThrownBy(()-> passengerService.profileComplete(phone, "ksr@gmail.com", "ksr"))
-                .isInstanceOf(InvalidOperationException.class);
     }
 
     @Test
