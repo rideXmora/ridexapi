@@ -29,15 +29,12 @@ public class Passenger {
 
     private Boolean enabled;
 
-    private Boolean suspend;
-
     public Passenger(String phone,
                      String email,
                      String name,
                      Integer totalRating,
                      Integer totalRides,
                      List<String> pastRides,
-                     Boolean suspend,
                      Boolean enabled) {
         this.phone = phone;
         this.email = email;
@@ -45,7 +42,6 @@ public class Passenger {
         this.totalRating = totalRating;
         this.totalRides = totalRides;
         this.pastRides = pastRides;
-        this.suspend = suspend;
         this.enabled = enabled;
     }
 }

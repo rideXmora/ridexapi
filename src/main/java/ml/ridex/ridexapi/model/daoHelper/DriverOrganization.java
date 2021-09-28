@@ -1,6 +1,5 @@
 package ml.ridex.ridexapi.model.daoHelper;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

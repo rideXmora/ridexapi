@@ -27,6 +27,4 @@ public class PassengerDTO {
     private List<String> pastRides;
 
     private Boolean enabled;
-
-    private Boolean suspend;
 }

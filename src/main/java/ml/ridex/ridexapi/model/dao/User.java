@@ -32,12 +32,15 @@ public class User implements UserDetails {
 
     private Boolean enabled;
 
-    public User(String phone, String password, List<Role> roles, long exp, Boolean enabled) {
+    private Boolean suspend;
+
+    public User(String phone, String password, List<Role> roles, long exp, Boolean enabled, Boolean suspend) {
         this.phone = phone;
         this.password = password;
         this.roles = roles;
         this.exp = exp;
         this.enabled = enabled;
+        this.suspend = suspend;
         this.authorities = roles.stream().map(role -> new SimpleGrantedAuthority(role.name())).collect(Collectors.toList());
     }
 

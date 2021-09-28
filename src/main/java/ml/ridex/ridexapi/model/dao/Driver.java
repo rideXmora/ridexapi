@@ -43,8 +43,6 @@ public class Driver {
 
     private Boolean enabled;
 
-    private Boolean suspend;
-
     public Driver(
             String phone,
             String email,
@@ -58,7 +56,6 @@ public class Driver {
             List<String> pastRides,
             Vehicle vehicle,
             DriverOrganization driverOrganization,
-            Boolean suspend,
             Boolean enabled) {
         this.phone = phone;
         this.email = email;
@@ -73,8 +70,5 @@ public class Driver {
         this.vehicle = vehicle;
         this.driverOrganization = driverOrganization;
         this.enabled = enabled;
-        this.suspend = suspend;
     }
-
-
 }

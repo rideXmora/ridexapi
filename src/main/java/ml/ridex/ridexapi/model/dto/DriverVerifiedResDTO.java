@@ -31,6 +31,4 @@ public class DriverVerifiedResDTO {
     private DriverOrganization driverOrganization;
 
     private Boolean enabled;
-
-    private Boolean suspend;
 }

@@ -67,10 +67,10 @@ public class UserServiceTest {
     @BeforeEach
     void setup() {
         userService = new UserService();
-        userPassenger = new User("+94714461798", "password", Arrays.asList(Role.PASSENGER), Instant.now().getEpochSecond()+100000, true);
-        userDriver = new User("+94714461798", "password", Arrays.asList(Role.DRIVER), Instant.now().getEpochSecond()+100000, true);
-        passenger = new Passenger("94714461798", null, null, 0, 0, new ArrayList<>(), false,true);
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null,false,false);
+        userPassenger = new User("+94714461798", "password", Arrays.asList(Role.PASSENGER), Instant.now().getEpochSecond()+100000, true, false);
+        userDriver = new User("+94714461798", "password", Arrays.asList(Role.DRIVER), Instant.now().getEpochSecond()+100000, true, false);
+        passenger = new Passenger("94714461798", null, null, 0, 0, new ArrayList<>(),true);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null,false);
         userRegPassenger = new UserReg("+94714461798", Role.PASSENGER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
         userRegDriver = new UserReg("+94714461798", Role.DRIVER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
 
@@ -104,7 +104,7 @@ public class UserServiceTest {
     void passengerVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
-        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(userPassenger));
+        when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(userPassenger));
         when(passengerRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(passenger));
         when(userRepository.save(any(User.class))).thenReturn(userPassenger);
 
@@ -118,7 +118,7 @@ public class UserServiceTest {
     void passengerSignupVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
-        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(null));
+        when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(null));
         when(userRepository.save(any(User.class))).thenReturn(userPassenger);
         when(passengerRepository.save(any(Passenger.class))).thenReturn(passenger);
 
@@ -132,7 +132,7 @@ public class UserServiceTest {
     void driverVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
-        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(userDriver));
+        when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(userDriver));
         when(driverRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(driver));
         when(userRepository.save(any(User.class))).thenReturn(userDriver);
 
@@ -146,7 +146,7 @@ public class UserServiceTest {
     void driverSignupVerify() {
         OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
-        when(userRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(null));
+        when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(null));
         when(userRepository.save(any(User.class))).thenReturn(userDriver);
         when(driverRepository.save(any(Driver.class))).thenReturn(driver);
 
@@ -159,7 +159,7 @@ public class UserServiceTest {
     @DisplayName("Return Authentication object")
     void getAuthentication() {
         String phone = "+94714461798";
-        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userPassenger));
+        when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userPassenger));
 
         assertThat(userService.getAuthentication(phone)).isNotNull();
     }
@@ -178,7 +178,7 @@ public class UserServiceTest {
     @DisplayName("Admin login")
     void adminLogin() {
         String phone = "+94714461798";
-        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userDriver));
+        when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userDriver));
         when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
         AdminLoginResDTO data = userService.adminLogin(phone);
         assertThat(data.getToken()).asString();
@@ -187,7 +187,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("OrgAdmin signup/success")
     void orgAdminSignup() {
-        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", false, true);
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
         when(orgAdminRepository.save(any(OrgAdmin.class))).thenReturn(orgAdmin);
 
         assertThat(userService.orgAdminSignup("ksr", "ksr@gmail.com","password","94714461798", "SF232","Kurunegala", "Adress").getEnabled()).isTrue();
@@ -197,8 +197,8 @@ public class UserServiceTest {
     @DisplayName("OrgAdmin login")
     void orgAdminLogin() {
         String phone = "+94714461798";
-        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", false, true);
-        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userDriver));
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
+        when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userDriver));
         when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
         when(orgAdminRepository.findByPhone(anyString())).thenReturn(Optional.of(orgAdmin));
 
