@@ -116,7 +116,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String phone) throws UsernameNotFoundException {
-        Optional<User> userOptional = userRepository.findByPhone(phone);
+        Optional<User> userOptional = userRepository.findByPhoneAndSuspend(phone, false);
         if(userOptional.isPresent())
             return userOptional.get();
         else
