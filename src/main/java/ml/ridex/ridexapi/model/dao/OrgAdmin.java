@@ -22,8 +22,6 @@ public class OrgAdmin {
 
     private String address;
 
-    private Boolean suspend;
-
     private Boolean enabled;
 
     public OrgAdmin(
@@ -33,7 +31,6 @@ public class OrgAdmin {
             String businessRegNo,
             String basedCity,
             String address,
-            Boolean suspend,
             Boolean enabled) {
         this.name = name;
         this.phone = phone;
@@ -41,7 +38,6 @@ public class OrgAdmin {
         this.businessRegNo = businessRegNo;
         this.basedCity = basedCity;
         this.address = address;
-        this.suspend = suspend;
         this.enabled = enabled;
     }
 }
