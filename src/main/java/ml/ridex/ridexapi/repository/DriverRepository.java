@@ -9,7 +9,6 @@ import java.util.Optional;
 
 public interface DriverRepository extends MongoRepository<Driver, String> {
     public Optional<Driver> findByPhone(String phone);
-    public Optional<Driver> findByPhoneAndSuspend(String phone, boolean suspend);
     public Boolean existsByPhone(String phone);
 
     @Query("{ 'driverOrganization._id': ObjectId(?0), 'enabled': ?1 }")

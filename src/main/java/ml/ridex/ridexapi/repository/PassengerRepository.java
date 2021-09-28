@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface PassengerRepository extends MongoRepository<Passenger, String> {
     public Optional<Passenger> findByPhone(String phone);
-    public Optional<Passenger> findByPhoneAndSuspend(String phone, boolean suspend);
     public Boolean existsByPhone(String phone);
 }
