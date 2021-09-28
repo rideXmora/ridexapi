@@ -25,6 +25,4 @@ public class PassengerVerifiedResDTO {
     private String refreshToken;
 
     private Boolean enabled;
-
-    private Boolean suspend;
 }
