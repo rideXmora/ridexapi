@@ -9,5 +9,5 @@ public class RideRequestPassenger {
     private String id;
     private String phone;
     private String name;
-    private Float rating;
+    private Double rating;
 }
