@@ -5,12 +5,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
-import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Driver;
+import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.daoHelper.Vehicle;
 import ml.ridex.ridexapi.model.dto.DriverDTO;
 import ml.ridex.ridexapi.model.dto.DriverProfileCompleteDTO;
 import ml.ridex.ridexapi.model.dto.DriverProfileUpdateDTO;
+import ml.ridex.ridexapi.model.dto.RideRequestAcceptDTO;
 import ml.ridex.ridexapi.service.DriverService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +49,6 @@ public class DriverController {
             return modelMapper.map(driver, DriverDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (InvalidOperationException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 
@@ -58,8 +57,7 @@ public class DriverController {
     @Operation(summary = "Add vehicle")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully completed"),
-            @ApiResponse(responseCode = "400", description = "User not found"),
-            @ApiResponse(responseCode = "401", description = "User is suspended")
+            @ApiResponse(responseCode = "400", description = "User not found")
     })
     public DriverDTO addVehicle(@Valid @RequestBody Vehicle data, Principal principal) {
         try {
@@ -67,8 +65,6 @@ public class DriverController {
            return modelMapper.map(driver, DriverDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (InvalidOperationException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 
@@ -77,8 +73,7 @@ public class DriverController {
     @Operation(summary = "Driver profile update")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated"),
-            @ApiResponse(responseCode = "400", description = "User not found"),
-            @ApiResponse(responseCode = "401", description = "User is suspended")
+            @ApiResponse(responseCode = "400", description = "User not found")
     })
     public DriverDTO profileUpdate(@Valid @RequestBody DriverProfileUpdateDTO data, Principal principal) {
         try {
@@ -86,8 +81,22 @@ public class DriverController {
             return modelMapper.map(driver, DriverDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (InvalidOperationException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @PutMapping("/ride/accept")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Accept ride request")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accepted"),
+            @ApiResponse(responseCode = "400", description = "User not found"),
+    })
+    public Ride acceptRideRequest(@Valid @RequestBody RideRequestAcceptDTO data, Principal principal) {
+        try {
+            Ride ride = driverService.acceptRideRequest(principal.getName(), data.getId());
+            return ride;
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }
