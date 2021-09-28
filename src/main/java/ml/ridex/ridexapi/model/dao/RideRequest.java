@@ -17,7 +17,11 @@ public class RideRequest {
 
     private RideRequestPassenger passenger;
 
-    private Location location;
+    private Location startLocation;
+
+    private Location endLocation;
+
+    private Integer distance;
 
     private RideRequestStatus status;
 
@@ -29,13 +33,17 @@ public class RideRequest {
 
     public RideRequest(
             RideRequestPassenger passenger,
-            Location location,
+            Location startLocation,
+            Location endLocation,
+            Integer distance,
             RideRequestStatus status,
             RideRequestDriver driver,
             DriverOrganization organization,
             long timestamp) {
         this.passenger = passenger;
-        this.location = location;
+        this.startLocation = startLocation;
+        this.endLocation = endLocation;
+        this.distance = distance;
         this.status = status;
         this.driver = driver;
         this.organization = organization;
