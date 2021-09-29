@@ -8,7 +8,9 @@ import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
 import ml.ridex.ridexapi.model.daoHelper.*;
+import ml.ridex.ridexapi.model.redis.DriverState;
 import ml.ridex.ridexapi.repository.DriverRepository;
+import ml.ridex.ridexapi.repository.RedisDriverStateRepository;
 import ml.ridex.ridexapi.repository.RideRepository;
 import ml.ridex.ridexapi.repository.RideRequestRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +41,8 @@ class DriverServiceTest {
     RideRepository rideRepository;
     @Mock
     RideRequestRepository rideRequestRepository;
+    @Mock
+    RedisDriverStateRepository redisDriverStateRepository;
 
     Driver driver;
     String phone;
@@ -52,6 +56,8 @@ class DriverServiceTest {
         ReflectionTestUtils.setField(driverService, "driverRepository", driverRepository);
         ReflectionTestUtils.setField(driverService, "rideRepository", rideRepository);
         ReflectionTestUtils.setField(driverService, "rideRequestRepository", rideRequestRepository);
+        ReflectionTestUtils.setField(driverService, "redisDriverStateRepository", redisDriverStateRepository);
+
     }
 
     @Test
@@ -119,5 +125,18 @@ class DriverServiceTest {
 
         assertThat(driverService.acceptRideRequest(phone, "id1").getRideRequest()).isNotNull();
 
+    }
+
+    @Test
+    @DisplayName("Toggle driver Status to ONLINE")
+    void toggleStatus() {
+        Location location = new Location(2.111,54.0);
+        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+        driver.setDriverStatus(DriverStatus.OFFLINE);
+        when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
+        when(driverRepository.save(any(Driver.class))).thenReturn(driver);
+        when(redisDriverStateRepository.save(any(DriverState.class))).thenReturn(driverState);
+
+        assertThat(driverService.toggleStatus(phone, location).getDriverStatus()).isEqualTo(DriverStatus.ONLINE);
     }
 }
