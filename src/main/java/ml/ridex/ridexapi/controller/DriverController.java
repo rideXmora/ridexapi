@@ -5,10 +5,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
+import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Ride;
+import ml.ridex.ridexapi.model.daoHelper.Location;
 import ml.ridex.ridexapi.model.daoHelper.Vehicle;
 import ml.ridex.ridexapi.model.dto.*;
+import ml.ridex.ridexapi.model.redis.DriverState;
 import ml.ridex.ridexapi.service.DriverService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +122,39 @@ public class DriverController {
         try {
             Driver driver = driverService.toggleStatus(principal.getName(), data.getLocation());
             return modelMapper.map(driver, DriverDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/location/update")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Update driver location")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Updated"),
+            @ApiResponse(responseCode = "400", description = "User not found"),
+            @ApiResponse(responseCode = "401", description = "Try to update location while offline")
+    })
+    public DriverState updateLocation(@Valid @RequestBody Location location, Principal principal) {
+        try {
+            return driverService.updateLocation(principal.getName(), location);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @PostMapping("/ride/changeRideStatus")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(description = "Change ride status after each phase completed")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Changed"),
+            @ApiResponse(responseCode = "400", description = "Invalid id or user")
+    })
+    public Ride rideArrived(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
+        try {
+            return driverService.changeRideStatus(principal.getName(), data.getId(), data.getStatus());
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
