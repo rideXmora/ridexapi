@@ -8,11 +8,7 @@ import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.daoHelper.Vehicle;
-import ml.ridex.ridexapi.model.dto.DriverDTO;
-import ml.ridex.ridexapi.model.dto.DriverProfileCompleteDTO;
-import ml.ridex.ridexapi.model.dto.DriverProfileUpdateDTO;
-import ml.ridex.ridexapi.model.dto.RideRequestAcceptDTO;
-import ml.ridex.ridexapi.model.dto.DriverLocationDTO;
+import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.service.DriverService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +76,17 @@ public class DriverController {
         try {
             Driver driver = driverService.profileUpdate(principal.getName(), data.getCity());
             return modelMapper.map(driver, DriverDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @GetMapping("/profile")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get profile details")
+    public DriverDTO getPassenger(Principal principal) {
+        try {
+            return modelMapper.map(driverService.getDriver(principal.getName()),DriverDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

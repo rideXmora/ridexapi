@@ -75,6 +75,17 @@ public class PassengerController {
         }
     }
 
+    @GetMapping("/profile")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get profile details")
+    public PassengerDTO getPassenger(Principal principal) {
+        try{
+            return modelMapper.map(passengerService.getPassenger(principal.getName()),PassengerDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
     @PostMapping("/ride/request")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create ride request")
