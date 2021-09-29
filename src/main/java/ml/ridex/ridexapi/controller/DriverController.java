@@ -12,6 +12,7 @@ import ml.ridex.ridexapi.model.dto.DriverDTO;
 import ml.ridex.ridexapi.model.dto.DriverProfileCompleteDTO;
 import ml.ridex.ridexapi.model.dto.DriverProfileUpdateDTO;
 import ml.ridex.ridexapi.model.dto.RideRequestAcceptDTO;
+import ml.ridex.ridexapi.model.dto.DriverLocationDTO;
 import ml.ridex.ridexapi.service.DriverService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +96,22 @@ public class DriverController {
         try {
             Ride ride = driverService.acceptRideRequest(principal.getName(), data.getId());
             return ride;
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PutMapping("/toggleStatus")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Change driver state between ONLINE, OFFLINE")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Change the status"),
+            @ApiResponse(responseCode = "400", description = "User not found"),
+    })
+    public DriverDTO toggleStatus(@Valid @RequestBody DriverLocationDTO data, Principal principal) {
+        try {
+            Driver driver = driverService.toggleStatus(principal.getName(), data.getLocation());
+            return modelMapper.map(driver, DriverDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

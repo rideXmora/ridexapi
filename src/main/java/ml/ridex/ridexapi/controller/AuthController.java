@@ -71,9 +71,9 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Saved user in memory"),
             @ApiResponse(responseCode = "500", description = "Unable to generate OTP")
     })
-    public String driverPhoneAuth(@Valid @RequestBody PhoneAuthDTO data) {
+    public MessageDTO driverPhoneAuth(@Valid @RequestBody PhoneAuthDTO data) {
         try {
-            return userService.sendOTP(data.getPhone(), Role.DRIVER);
+            return new MessageDTO(userService.sendOTP(data.getPhone(), Role.DRIVER));
         } catch (InvalidKeyException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }

@@ -1,6 +1,7 @@
 package ml.ridex.ridexapi.model.dto;
 
 import lombok.Data;
+import ml.ridex.ridexapi.enums.DriverStatus;
 import ml.ridex.ridexapi.model.daoHelper.DriverOrganization;
 import ml.ridex.ridexapi.model.daoHelper.Vehicle;
 
@@ -29,6 +30,8 @@ public class DriverVerifiedResDTO {
     private Vehicle vehicle;
 
     private DriverOrganization driverOrganization;
+
+    private DriverStatus status;
 
     private Boolean enabled;
 }

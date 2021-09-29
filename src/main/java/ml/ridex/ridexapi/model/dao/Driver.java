@@ -2,6 +2,7 @@ package ml.ridex.ridexapi.model.dao;
 
 import lombok.Getter;
 import lombok.Setter;
+import ml.ridex.ridexapi.enums.DriverStatus;
 import ml.ridex.ridexapi.model.daoHelper.DriverOrganization;
 import ml.ridex.ridexapi.model.daoHelper.Vehicle;
 import org.springframework.data.annotation.Id;
@@ -41,6 +42,8 @@ public class Driver {
 
     private DriverOrganization driverOrganization;
 
+    private DriverStatus driverStatus;
+
     private Boolean enabled;
 
     public Driver(
@@ -56,6 +59,7 @@ public class Driver {
             List<String> pastRides,
             Vehicle vehicle,
             DriverOrganization driverOrganization,
+            DriverStatus driverStatus,
             Boolean enabled) {
         this.phone = phone;
         this.email = email;
@@ -69,6 +73,7 @@ public class Driver {
         this.pastRides = pastRides;
         this.vehicle = vehicle;
         this.driverOrganization = driverOrganization;
+        this.driverStatus = driverStatus;
         this.enabled = enabled;
     }
 }
