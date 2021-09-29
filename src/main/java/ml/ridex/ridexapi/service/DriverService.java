@@ -3,6 +3,7 @@ package ml.ridex.ridexapi.service;
 import ml.ridex.ridexapi.enums.DriverStatus;
 import ml.ridex.ridexapi.enums.RideRequestStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
+import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
@@ -106,5 +107,20 @@ public class DriverService {
             redisDriverStateRepository.save(state);
         }
         return driverRepository.save(driver);
+    }
+
+    public DriverState updateLocation(String phone, Location location) throws EntityNotFoundException {
+        Optional<DriverState> driverStateOptional = redisDriverStateRepository.findById(phone);
+        DriverState driverState;
+        if(driverStateOptional.isEmpty()) {
+            Driver driver = getDriver(phone);
+            if(driver.getDriverStatus() != DriverStatus.ONLINE)
+                throw new InvalidOperationException("Driver is not ONLINE");
+            driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+        }
+        else
+            driverState = driverStateOptional.get();
+        driverState.setLocation(location);
+        return redisDriverStateRepository.save(driverState);
     }
 }
