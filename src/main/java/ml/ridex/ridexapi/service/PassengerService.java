@@ -23,7 +23,7 @@ public class PassengerService {
     @Autowired
     private RideRequestRepository rideRequestRepository;
 
-    private Passenger getPassenger(String phone) {
+    public Passenger getPassenger(String phone) {
         Optional<Passenger> passengerOptional = passengerRepository.findByPhone(phone);
         if(passengerOptional.isEmpty())
             throw new EntityNotFoundException("User not found");
