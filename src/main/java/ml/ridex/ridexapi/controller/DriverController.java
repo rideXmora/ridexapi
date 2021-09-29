@@ -101,14 +101,14 @@ public class DriverController {
         }
     }
 
-    @PutMapping("/toggleState")
+    @PutMapping("/toggleStatus")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Change driver state between ONLINE, OFFLINE")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Change the status"),
             @ApiResponse(responseCode = "400", description = "User not found"),
     })
-    public DriverDTO toggleState(@Valid @RequestBody DriverLocationDTO data, Principal principal) {
+    public DriverDTO toggleStatus(@Valid @RequestBody DriverLocationDTO data, Principal principal) {
         try {
             Driver driver = driverService.toggleStatus(principal.getName(), data.getLocation());
             return modelMapper.map(driver, DriverDTO.class);

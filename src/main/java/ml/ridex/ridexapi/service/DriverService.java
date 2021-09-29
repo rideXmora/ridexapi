@@ -9,7 +9,7 @@ import ml.ridex.ridexapi.model.dao.RideRequest;
 import ml.ridex.ridexapi.model.daoHelper.*;
 import ml.ridex.ridexapi.model.redis.DriverState;
 import ml.ridex.ridexapi.repository.DriverRepository;
-import ml.ridex.ridexapi.repository.RedisDriverStatusRepository;
+import ml.ridex.ridexapi.repository.RedisDriverStateRepository;
 import ml.ridex.ridexapi.repository.RideRepository;
 import ml.ridex.ridexapi.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class DriverService {
     private RideRepository rideRepository;
 
     @Autowired
-    private RedisDriverStatusRepository redisDriverStatusRepository;
+    private RedisDriverStateRepository redisDriverStateRepository;
 
     public Driver getDriver(String phone) {
         Optional<Driver> driverOptional = driverRepository.findByPhone(phone);
@@ -98,12 +98,12 @@ public class DriverService {
         Driver driver = getDriver(phone);
         if(driver.getDriverStatus() == DriverStatus.ONLINE) {
             driver.setDriverStatus(DriverStatus.OFFLINE);
-            redisDriverStatusRepository.deleteById(phone);
+            redisDriverStateRepository.deleteById(phone);
         }
         else {
             driver.setDriverStatus(DriverStatus.ONLINE);
             state = new DriverState(phone, location, Instant.now().getEpochSecond());
-            redisDriverStatusRepository.save(state);
+            redisDriverStateRepository.save(state);
         }
         return driverRepository.save(driver);
     }
