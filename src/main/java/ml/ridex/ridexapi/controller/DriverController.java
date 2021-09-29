@@ -144,4 +144,19 @@ public class DriverController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
+
+    @PostMapping("/ride/changeRideStatus")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(description = "Change ride status after each phase completed")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Changed"),
+            @ApiResponse(responseCode = "400", description = "Invalid id or user")
+    })
+    public Ride rideArrived(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
+        try {
+            return driverService.changeRideStatus(principal.getName(), data.getId(), data.getStatus());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
 }

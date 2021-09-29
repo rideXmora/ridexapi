@@ -2,6 +2,7 @@ package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.DriverStatus;
 import ml.ridex.ridexapi.enums.RideRequestStatus;
+import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.enums.VehicleType;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.model.dao.Driver;
@@ -107,6 +108,7 @@ class DriverServiceTest {
     void acceptRideRequest() {
         Vehicle vehicle = new Vehicle("NW1231", VehicleType.CAR,"Alto","dsfsd","ins", "124");
         driver.setVehicle(vehicle);
+        driver.setEnabled(true);
         Location sl = new Location(1.32432,121.12312);
         RideRequest rideRequest = new RideRequest(
                 new RideRequestPassenger("id",phone,"ksr",12.2),
@@ -117,14 +119,13 @@ class DriverServiceTest {
                 new RideRequestDriver("idDr",phone, new RideRequestVehicle("Nw",VehicleType.CAR,"Nixxan"),12.78),
                 new DriverOrganization("id3","nameOrg"),
                 Instant.now().getEpochSecond());
-        Ride ride = new Ride(rideRequest, "","", 1222.4);
+        Ride ride = new Ride(rideRequest, "","", 1222.4, RideStatus.ACCEPTED);
         when(rideRequestRepository.findById(anyString())).thenReturn(Optional.of(rideRequest));
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(rideRequestRepository.save(any(RideRequest.class))).thenReturn(rideRequest);
         when(rideRepository.save(any(Ride.class))).thenReturn(ride);
 
         assertThat(driverService.acceptRideRequest(phone, "id1").getRideRequest()).isNotNull();
-
     }
 
     @Test
