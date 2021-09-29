@@ -139,4 +139,30 @@ class DriverServiceTest {
 
         assertThat(driverService.toggleStatus(phone, location).getDriverStatus()).isEqualTo(DriverStatus.ONLINE);
     }
+
+    @Test
+    @DisplayName("Updating driver location when available in redis")
+    void updateLocation() {
+        Location location = new Location(2.111,54.0);
+        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+
+        when(redisDriverStateRepository.findById(phone)).thenReturn(Optional.ofNullable(driverState));
+        when(redisDriverStateRepository.save(driverState)).thenReturn(driverState);
+
+        assertThat(driverService.updateLocation(phone,location)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Updating driver location when not available in redis")
+    void updateLocationNewObject() {
+        driver.setDriverStatus(DriverStatus.ONLINE);
+        Location location = new Location(2.111,54.0);
+        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+
+        when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
+        when(redisDriverStateRepository.findById(phone)).thenReturn(Optional.ofNullable(null));
+        when(redisDriverStateRepository.save(driverState)).thenReturn(driverState);
+
+        assertThat(driverService.updateLocation(phone,location)).isNotNull();
+    }
 }
