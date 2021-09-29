@@ -1,5 +1,6 @@
 package ml.ridex.ridexapi.service;
 
+import ml.ridex.ridexapi.enums.DriverStatus;
 import ml.ridex.ridexapi.enums.RideRequestStatus;
 import ml.ridex.ridexapi.enums.VehicleType;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
@@ -45,7 +46,7 @@ class DriverServiceTest {
     @BeforeEach
     void setup() {
         driverService = new DriverService();
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null,false);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null, DriverStatus.OFFLINE,false);
         phone = "+94714461798";
 
         ReflectionTestUtils.setField(driverService, "driverRepository", driverRepository);

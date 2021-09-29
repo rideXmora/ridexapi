@@ -1,6 +1,7 @@
 package ml.ridex.ridexapi.service;
 
 import com.twilio.exception.ApiException;
+import ml.ridex.ridexapi.enums.DriverStatus;
 import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
@@ -200,6 +201,7 @@ public class UserService implements UserDetailsService {
                     new ArrayList<>(),
                     null,
                     null,
+                    DriverStatus.OFFLINE,
                     false));
         }
         DriverVerifiedResDTO response = modelMapper.map(driver, DriverVerifiedResDTO.class);
