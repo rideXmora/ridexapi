@@ -117,7 +117,7 @@ public class DriverService {
         // update ride rideRequest
         rideRequestRepository.save(rideRequest);
 
-        Ride ride = new Ride(rideRequest, null, null, cost, RideStatus.ACCEPTED);
+        Ride ride = new Ride(rideRequest, null, null,null, null, cost, RideStatus.ACCEPTED);
         // init ride
         return rideRepository.save(ride);
     }
@@ -158,6 +158,17 @@ public class DriverService {
             throw new EntityNotFoundException("Invalid id");
         Ride ride = rideOptional.get();
         ride.setRideStatus(rideStatus);
+        return rideRepository.save(ride);
+    }
+
+    public Ride finishRide(String phone, String id, RideStatus rideStatus, Byte passengerRating, String driverFeedback) {
+        Optional<Ride> rideOptional = rideRepository.findByIdAndRideRequestDriverPhone(id, phone);
+        if(rideOptional.isEmpty())
+            throw new EntityNotFoundException("Invalid id");
+        Ride ride = rideOptional.get();
+        ride.setRideStatus(rideStatus);
+        ride.setDriverFeedback(driverFeedback);
+        ride.setPassengerRating(passengerRating);
         return rideRepository.save(ride);
     }
 }

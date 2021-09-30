@@ -198,9 +198,13 @@ public class DriverController {
             @ApiResponse(responseCode = "200", description = "Finished"),
             @ApiResponse(responseCode = "400", description = "Invalid id or user")
     })
-    public Ride rideFinished(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
+    public Ride rideFinished(@Valid @RequestBody DriverRideFinishDTO data, Principal principal) {
         try {
-            return driverService.changeRideStatus(principal.getName(), data.getId(), RideStatus.FINISHED);
+            return driverService.finishRide(principal.getName(),
+                    data.getId(),
+                    RideStatus.FINISHED,
+                    data.getPassengerRating(),
+                    data.getDriverFeedback());
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
