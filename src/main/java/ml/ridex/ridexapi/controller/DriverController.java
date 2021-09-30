@@ -204,7 +204,8 @@ public class DriverController {
                     data.getId(),
                     RideStatus.FINISHED,
                     data.getPassengerRating(),
-                    data.getDriverFeedback());
+                    data.getDriverFeedback(),
+                    data.getWaitingTime());
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

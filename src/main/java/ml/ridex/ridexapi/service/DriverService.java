@@ -46,6 +46,13 @@ public class DriverService {
         return driverOptional.get();
     }
 
+    public OrgAdmin getOrgAdmin(String id) {
+        Optional<OrgAdmin> orgAdminOptional = orgAdminRepository.findById(id);
+        if(orgAdminOptional.isEmpty())
+            throw new EntityNotFoundException("Invalid organizational id");
+        return orgAdminOptional.get();
+    }
+
     public Driver profileComplete(
             String phone,
             String name,
@@ -102,11 +109,8 @@ public class DriverService {
         rideRequest.setOrganization(driver.getDriverOrganization());
         rideRequest.setDriver(rideRequestDriver);
 
-        // Payment cal method
-        Optional<OrgAdmin> orgAdminOptional = orgAdminRepository.findById(driver.getDriverOrganization().getId());
-        if(orgAdminOptional.isEmpty())
-            throw new EntityNotFoundException("Invalid organizational id");
-        OrgAdmin orgAdmin = orgAdminOptional.get();
+        OrgAdmin orgAdmin = this.getOrgAdmin(driver.getDriverOrganization().getId());
+
         if(orgAdmin.getPayment() == null)
             throw new InvalidOperationException("Organize has not complete the profile");
         // Cost calculation
@@ -161,11 +165,20 @@ public class DriverService {
         return rideRepository.save(ride);
     }
 
-    public Ride finishRide(String phone, String id, RideStatus rideStatus, Byte passengerRating, String driverFeedback) {
+    public Ride finishRide(String phone,
+                           String id,
+                           RideStatus rideStatus,
+                           Byte passengerRating,
+                           String driverFeedback,
+                           Integer waitingTime) {
         Optional<Ride> rideOptional = rideRepository.findByIdAndRideRequestDriverPhone(id, phone);
         if(rideOptional.isEmpty())
             throw new EntityNotFoundException("Invalid id");
         Ride ride = rideOptional.get();
+        if(waitingTime >0) {
+            OrgAdmin orgAdmin = this.getOrgAdmin(ride.getRideRequest().getOrganization().getId());
+            ride.setPayment(ride.getPayment() + orgAdmin.getPayment().getRateWaitingPerMin()*waitingTime);
+        }
         ride.setRideStatus(rideStatus);
         ride.setDriverFeedback(driverFeedback);
         ride.setPassengerRating(passengerRating);
