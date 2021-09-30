@@ -4,12 +4,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
+import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dto.DriverDTO;
 import ml.ridex.ridexapi.model.dto.OrgAdminEnableDriver;
+import ml.ridex.ridexapi.model.dto.SuspendUserDTO;
+import ml.ridex.ridexapi.model.dto.UserDTO;
 import ml.ridex.ridexapi.service.OrgAdminService;
+import ml.ridex.ridexapi.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +38,9 @@ public class OrgAdminController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/drivers/registered")
     @Operation(summary = "Get registered drivers")
@@ -77,6 +85,24 @@ public class OrgAdminController {
         try {
             OrgAdmin orgAdmin = orgAdminService.getOrgAdmin(principal.getName());
             return this.convertToDriverDTO(orgAdminService.enableDriver(data.getPhone(), orgAdmin.getId(), data.getEnabled()));
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/driver/suspend")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Un/Suspend driver")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "change suspend status"),
+            @ApiResponse(responseCode = "403", description = "Do not have permission")
+    })
+    public UserDTO suspendPassenger(@Valid @RequestBody SuspendUserDTO data) {
+        try {
+            return modelMapper.map(userService.suspend(data.getPhone(),
+                    data.getSuspend(), Role.DRIVER), UserDTO.class);
+        } catch(InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         } catch(EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

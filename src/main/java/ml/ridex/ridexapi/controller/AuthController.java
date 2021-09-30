@@ -10,6 +10,7 @@ import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,7 +52,8 @@ public class AuthController {
     @Operation(summary = "Verify OTP/passenger")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login/Signup"),
-            @ApiResponse(responseCode = "401", description = "Invalid OTP/phone")
+            @ApiResponse(responseCode = "401", description = "Invalid OTP/phone"),
+            @ApiResponse(responseCode = "403", description = "User is suspended")
     })
     public PassengerVerifiedResDTO passengerPhoneVerify(@Valid @RequestBody OtpVerifyDTO data) {
         try{
@@ -61,6 +63,8 @@ public class AuthController {
         }
         catch (InvalidOperationException | EntityNotFoundException | AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (DuplicateKeyException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is suspended");
         }
     }
 
@@ -84,7 +88,8 @@ public class AuthController {
     @Operation(summary = "Verify OTP/driver")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login/Signup"),
-            @ApiResponse(responseCode = "401", description = "Invalid OTP/phone")
+            @ApiResponse(responseCode = "401", description = "Invalid OTP/phone"),
+            @ApiResponse(responseCode = "403", description = "User is suspended")
     })
     public DriverVerifiedResDTO driverPhoneVerify(@Valid @RequestBody OtpVerifyDTO data) {
         try{
@@ -94,6 +99,8 @@ public class AuthController {
         }
         catch (InvalidOperationException | EntityNotFoundException | AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (DuplicateKeyException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is suspended");
         }
     }
 
