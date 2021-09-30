@@ -17,14 +17,26 @@ public class Ride {
 
     private String passengerFeedback;
 
+    private Byte driverRating;
+
+    private Byte passengerRating;
+
     private Double payment;
 
     private RideStatus rideStatus;
 
-    public Ride(RideRequest rideRequest, String driverFeedback, String passengerFeedback, Double payment, RideStatus rideStatus) {
+    public Ride(RideRequest rideRequest,
+                String driverFeedback,
+                String passengerFeedback,
+                Byte driverRating,
+                Byte passengerRating,
+                Double payment,
+                RideStatus rideStatus) {
         this.rideRequest = rideRequest;
         this.driverFeedback = driverFeedback;
         this.passengerFeedback = passengerFeedback;
+        this.driverRating = driverRating;
+        this.passengerRating = passengerRating;
         this.payment = payment;
         this.rideStatus = rideStatus;
     }

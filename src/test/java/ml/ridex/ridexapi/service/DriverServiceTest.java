@@ -129,7 +129,7 @@ class DriverServiceTest {
                 new RideRequestDriver("idDr",phone, new RideRequestVehicle("Nw",VehicleType.CAR,"Nixxan"),12.78),
                 new DriverOrganization("id3","nameOrg"),
                 Instant.now().getEpochSecond());
-        Ride ride = new Ride(rideRequest, "","", 1222.4, RideStatus.ACCEPTED);
+        Ride ride = new Ride(rideRequest, "","", null,null,1222.4, RideStatus.ACCEPTED);
         when(rideRequestRepository.findById(anyString())).thenReturn(Optional.of(rideRequest));
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(rideRequestRepository.save(any(RideRequest.class))).thenReturn(rideRequest);
