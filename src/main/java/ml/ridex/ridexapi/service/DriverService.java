@@ -6,6 +6,7 @@ import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Driver;
+import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
 import ml.ridex.ridexapi.model.daoHelper.*;
@@ -13,6 +14,7 @@ import ml.ridex.ridexapi.model.redis.DriverState;
 import ml.ridex.ridexapi.repository.DriverRepository;
 import ml.ridex.ridexapi.repository.RedisDriverStateRepository;
 import ml.ridex.ridexapi.repository.RideRepository;
+import ml.ridex.ridexapi.repository.OrgAdminRepository;
 import ml.ridex.ridexapi.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,9 @@ public class DriverService {
 
     @Autowired
     private RideRepository rideRepository;
+
+    @Autowired
+    private OrgAdminRepository orgAdminRepository;
 
     @Autowired
     private RedisDriverStateRepository redisDriverStateRepository;
@@ -69,11 +74,13 @@ public class DriverService {
 
     public Ride acceptRideRequest(String phone, String id) throws EntityNotFoundException {
         Optional<RideRequest> rideRequestOptional = rideRequestRepository.findById(id);
+        if(rideRequestOptional.isEmpty())
+            throw new EntityNotFoundException("Invalid id");
+        // RideRequest
         RideRequest rideRequest = rideRequestOptional.get();
         if(rideRequest.getStatus() == RideRequestStatus.ACCEPTED)
             throw new InvalidOperationException("All ready accepted by someone else");
-        if(rideRequestOptional.isEmpty())
-            throw new EntityNotFoundException("Invalid id");
+        // Driver
         Driver driver = getDriver(phone);
         if(!driver.getEnabled())
             throw new InvalidOperationException("Invalid driver");
@@ -90,12 +97,28 @@ public class DriverService {
                 driver.getPhone(),
                 rideRequestVehicle,
                 (double) driver.getTotalRating()/totalRides);
+
         rideRequest.setStatus(RideRequestStatus.ACCEPTED);
         rideRequest.setOrganization(driver.getDriverOrganization());
         rideRequest.setDriver(rideRequestDriver);
-        rideRequestRepository.save(rideRequest);
+
         // Payment cal method
-        Ride ride = new Ride(rideRequest, null, null, 100.00, RideStatus.ACCEPTED);
+        Optional<OrgAdmin> orgAdminOptional = orgAdminRepository.findById(driver.getDriverOrganization().getId());
+        if(orgAdminOptional.isEmpty())
+            throw new EntityNotFoundException("Invalid organizational id");
+        OrgAdmin orgAdmin = orgAdminOptional.get();
+        if(orgAdmin.getPayment() == null)
+            throw new InvalidOperationException("Organize has not complete the profile");
+        // Cost calculation
+        Double cost = rideRequest.getDistance()
+                *orgAdmin.getPayment().getRatePerMeter()
+                *(100-orgAdmin.getPayment().getDiscount())/100;
+
+        // update ride rideRequest
+        rideRequestRepository.save(rideRequest);
+
+        Ride ride = new Ride(rideRequest, null, null, cost, RideStatus.ACCEPTED);
+        // init ride
         return rideRepository.save(ride);
     }
 

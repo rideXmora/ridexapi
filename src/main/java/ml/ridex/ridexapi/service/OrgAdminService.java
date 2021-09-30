@@ -48,8 +48,10 @@ public class OrgAdminService {
     public Payment setPayment(String phone, OrgAdminPaymentDTO data) throws EntityNotFoundException {
         OrgAdmin orgAdmin = getOrgAdmin(phone);
         Payment payment;
-        if(orgAdmin.getPayment() == null)
+        if(orgAdmin.getPayment() == null) {
             payment = new Payment();
+            payment.setDiscount(0.0);
+        }
         else
             payment = orgAdmin.getPayment();
 
