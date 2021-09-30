@@ -13,6 +13,7 @@ import ml.ridex.ridexapi.model.dto.DriverDTO;
 import ml.ridex.ridexapi.model.dto.OrgAdminEnableDriver;
 import ml.ridex.ridexapi.model.dto.SuspendUserDTO;
 import ml.ridex.ridexapi.model.dto.UserDTO;
+import ml.ridex.ridexapi.model.dto.OrgAdminPaymentDTO;
 import ml.ridex.ridexapi.service.OrgAdminService;
 import ml.ridex.ridexapi.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -105,6 +106,21 @@ public class OrgAdminController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         } catch(EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/setPayment")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Set payment - need this for cal of ride cost")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "payment added/ updated"),
+            @ApiResponse(responseCode = "400", description = "User not found")
+    })
+    public OrgAdminPaymentDTO setPayment(@Valid @RequestBody OrgAdminPaymentDTO data, Principal principal) {
+        try {
+            return modelMapper.map(orgAdminService.setPayment(principal.getName(), data), OrgAdminPaymentDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
     }
 
