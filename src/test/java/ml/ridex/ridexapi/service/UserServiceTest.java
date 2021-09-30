@@ -189,7 +189,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("OrgAdmin signup/success")
     void orgAdminSignup() {
-        OrgAdmin orgAdmin = new OrgAdmin("ksr", phone, "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", phone, "ksr@gmail.com", "SF232","Kurunegala", "Adress",null, true);
         when(orgAdminRepository.save(any(OrgAdmin.class))).thenReturn(orgAdmin);
 
         assertThat(userService.orgAdminSignup("ksr", "ksr@gmail.com","password","94714461798", "SF232","Kurunegala", "Adress").getEnabled()).isTrue();
@@ -198,7 +198,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("OrgAdmin login")
     void orgAdminLogin() {
-        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress",null, true);
         when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userDriver));
         when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
         when(orgAdminRepository.findByPhone(anyString())).thenReturn(Optional.of(orgAdmin));

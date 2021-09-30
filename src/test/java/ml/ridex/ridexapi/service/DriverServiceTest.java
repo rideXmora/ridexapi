@@ -6,14 +6,12 @@ import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.enums.VehicleType;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.model.dao.Driver;
+import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
 import ml.ridex.ridexapi.model.daoHelper.*;
 import ml.ridex.ridexapi.model.redis.DriverState;
-import ml.ridex.ridexapi.repository.DriverRepository;
-import ml.ridex.ridexapi.repository.RedisDriverStateRepository;
-import ml.ridex.ridexapi.repository.RideRepository;
-import ml.ridex.ridexapi.repository.RideRequestRepository;
+import ml.ridex.ridexapi.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +41,8 @@ class DriverServiceTest {
     @Mock
     RideRequestRepository rideRequestRepository;
     @Mock
+    OrgAdminRepository orgAdminRepository;
+    @Mock
     RedisDriverStateRepository redisDriverStateRepository;
 
     Driver driver;
@@ -58,7 +58,7 @@ class DriverServiceTest {
         ReflectionTestUtils.setField(driverService, "rideRepository", rideRepository);
         ReflectionTestUtils.setField(driverService, "rideRequestRepository", rideRequestRepository);
         ReflectionTestUtils.setField(driverService, "redisDriverStateRepository", redisDriverStateRepository);
-
+        ReflectionTestUtils.setField(driverService, "orgAdminRepository", orgAdminRepository);
     }
 
     @Test
@@ -106,9 +106,19 @@ class DriverServiceTest {
 
     @Test
     void acceptRideRequest() {
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", phone,"ksr@gmail.com", "sadafd","Col","Address",null,true);
         Vehicle vehicle = new Vehicle("NW1231", VehicleType.CAR,"Alto","dsfsd","ins", "124");
+
+        Payment payment = new Payment();
+        payment.setRatePerMeter(1000.0);
+        payment.setRateWaitingPerMin(10.1);
+        payment.setDiscount(12.0);
+
+        orgAdmin.setPayment(payment);
+
         driver.setVehicle(vehicle);
         driver.setEnabled(true);
+        driver.setDriverOrganization(new DriverOrganization("OrgId", "Uber"));
         Location sl = new Location(1.32432,121.12312);
         RideRequest rideRequest = new RideRequest(
                 new RideRequestPassenger("id",phone,"ksr",12.2),
@@ -124,6 +134,7 @@ class DriverServiceTest {
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(rideRequestRepository.save(any(RideRequest.class))).thenReturn(rideRequest);
         when(rideRepository.save(any(Ride.class))).thenReturn(ride);
+        when(orgAdminRepository.findById(anyString())).thenReturn(Optional.ofNullable(orgAdmin));
 
         assertThat(driverService.acceptRideRequest(phone, "id1").getRideRequest()).isNotNull();
     }

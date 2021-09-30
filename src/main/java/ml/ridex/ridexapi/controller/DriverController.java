@@ -147,7 +147,7 @@ public class DriverController {
 
     @PostMapping("/ride/changeRideStatus")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "Change ride status after each phase completed")
+    @Operation(summary = "Change ride status after each phase completed")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Changed"),
             @ApiResponse(responseCode = "400", description = "Invalid id or user")
