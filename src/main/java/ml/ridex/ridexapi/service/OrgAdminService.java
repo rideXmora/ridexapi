@@ -3,6 +3,8 @@ package ml.ridex.ridexapi.service;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
+import ml.ridex.ridexapi.model.daoHelper.Payment;
+import ml.ridex.ridexapi.model.dto.OrgAdminPaymentDTO;
 import ml.ridex.ridexapi.repository.DriverRepository;
 import ml.ridex.ridexapi.repository.OrgAdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,5 +43,24 @@ public class OrgAdminService {
         Driver driver = driverOptional.get();
         driver.setEnabled(enabled);
         return driverRepository.save(driver);
+    }
+
+    public Payment setPayment(String phone, OrgAdminPaymentDTO data) throws EntityNotFoundException {
+        OrgAdmin orgAdmin = getOrgAdmin(phone);
+        Payment payment;
+        if(orgAdmin.getPayment() == null)
+            payment = new Payment();
+        else
+            payment = orgAdmin.getPayment();
+
+        if(data.getRatePerMeter() != null)
+            payment.setRatePerMeter(data.getRatePerMeter());
+        if(data.getRateWaitingPerMin() != null)
+            payment.setRateWaitingPerMin(data.getRateWaitingPerMin());
+        if(data.getDiscount() != null)
+            payment.setDiscount(data.getDiscount());
+        orgAdmin.setPayment(payment);
+        orgAdminRepository.save(orgAdmin);
+        return payment;
     }
 }

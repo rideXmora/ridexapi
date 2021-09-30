@@ -241,6 +241,7 @@ public class UserService implements UserDetailsService {
                 businessRegNo,
                 basedCity,
                 address,
+                null,
                 true);
         return orgAdminRepository.save(orgAdminData);
     }
