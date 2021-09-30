@@ -10,6 +10,4 @@ import javax.validation.constraints.NotNull;
 public class DriverRideStatusChangeDTO {
     @NotBlank
     private String id;
-    @NotNull
-    private RideStatus status;
 }

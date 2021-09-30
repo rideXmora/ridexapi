@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Driver;
@@ -145,16 +146,61 @@ public class DriverController {
         }
     }
 
-    @PostMapping("/ride/changeRideStatus")
+    @PostMapping("/ride/status/arrived")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Change ride status after each phase completed")
+    @Operation(summary = "Driver arrived")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Changed"),
+            @ApiResponse(responseCode = "200", description = "Driver arrived"),
             @ApiResponse(responseCode = "400", description = "Invalid id or user")
     })
     public Ride rideArrived(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
         try {
-            return driverService.changeRideStatus(principal.getName(), data.getId(), data.getStatus());
+            return driverService.changeRideStatus(principal.getName(), data.getId(), RideStatus.ARRIVED);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/ride/status/picked")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Driver picked the passenger")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Driver picked the passenger"),
+            @ApiResponse(responseCode = "400", description = "Invalid id or user")
+    })
+    public Ride ridePicked(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
+        try {
+            return driverService.changeRideStatus(principal.getName(), data.getId(), RideStatus.PICKED);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/ride/status/dropped")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Reached to the dropped location")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dropped"),
+            @ApiResponse(responseCode = "400", description = "Invalid id or user")
+    })
+    public Ride rideDropped(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
+        try {
+            return driverService.changeRideStatus(principal.getName(), data.getId(), RideStatus.DROPPED);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/ride/status/finished")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Finished the ride")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Finished"),
+            @ApiResponse(responseCode = "400", description = "Invalid id or user")
+    })
+    public Ride rideFinished(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
+        try {
+            return driverService.changeRideStatus(principal.getName(), data.getId(), RideStatus.FINISHED);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
