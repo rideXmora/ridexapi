@@ -2,6 +2,7 @@ package ml.ridex.ridexapi.model.dao;
 
 import lombok.Getter;
 import lombok.Setter;
+import ml.ridex.ridexapi.model.daoHelper.RideSummary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -25,7 +26,7 @@ public class Passenger {
 
     private Integer totalRides;
 
-    private List<String> pastRides;
+    private List<RideSummary> pastRides;
 
     private Boolean enabled;
 
@@ -34,7 +35,7 @@ public class Passenger {
                      String name,
                      Integer totalRating,
                      Integer totalRides,
-                     List<String> pastRides,
+                     List<RideSummary> pastRides,
                      Boolean enabled) {
         this.phone = phone;
         this.email = email;

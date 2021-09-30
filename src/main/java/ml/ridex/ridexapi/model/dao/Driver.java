@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ml.ridex.ridexapi.enums.DriverStatus;
 import ml.ridex.ridexapi.model.daoHelper.DriverOrganization;
+import ml.ridex.ridexapi.model.daoHelper.RideSummary;
 import ml.ridex.ridexapi.model.daoHelper.Vehicle;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -36,7 +37,7 @@ public class Driver {
 
     private Integer totalRides;
 
-    private List<String> pastRides;
+    private List<RideSummary> pastRides;
 
     private Vehicle vehicle;
 
@@ -56,7 +57,7 @@ public class Driver {
             Integer sessionIncome,
             Integer totalRating,
             Integer totalRides,
-            List<String> pastRides,
+            List<RideSummary> pastRides,
             Vehicle vehicle,
             DriverOrganization driverOrganization,
             DriverStatus driverStatus,
