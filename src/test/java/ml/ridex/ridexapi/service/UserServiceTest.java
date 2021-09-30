@@ -2,6 +2,7 @@ package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.DriverStatus;
 import ml.ridex.ridexapi.enums.Role;
+import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.helper.OtpGenerator;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -64,6 +66,7 @@ public class UserServiceTest {
     Driver driver;
     UserReg userRegPassenger;
     UserReg userRegDriver;
+    String phone;
 
     @BeforeEach
     void setup() {
@@ -74,6 +77,7 @@ public class UserServiceTest {
         driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null, DriverStatus.OFFLINE,false);
         userRegPassenger = new UserReg("+94714461798", Role.PASSENGER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
         userRegDriver = new UserReg("+94714461798", Role.DRIVER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
+        phone = "+94714461798";
 
         ReflectionTestUtils.setField(userService, "redisUserRegRepository", redisUserRegRepository);
         ReflectionTestUtils.setField(userService, "passengerRepository", passengerRepository);
@@ -91,7 +95,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Passenger sing up successfully")
     void phoneAuth() throws InvalidKeyException {
-        PhoneAuthDTO phoneAuthDTO = new PhoneAuthDTO("+94714461798");
+        PhoneAuthDTO phoneAuthDTO = new PhoneAuthDTO(phone);
 
         when(redisUserRegRepository.save(any(UserReg.class))).thenReturn(userRegPassenger);
         doNothing().when(smsSender).sendSms(anyString(), anyString());
@@ -103,7 +107,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Passenger OTP verification successfully/with reg")
     void passengerVerify() {
-        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        OtpVerifyDTO dto = new OtpVerifyDTO(phone, "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
         when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(userPassenger));
         when(passengerRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(passenger));
@@ -117,7 +121,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Passenger OTP verification successfully")
     void passengerSignupVerify() {
-        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        OtpVerifyDTO dto = new OtpVerifyDTO(phone, "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegPassenger));
         when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(null));
         when(userRepository.save(any(User.class))).thenReturn(userPassenger);
@@ -131,7 +135,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Driver OTP verification successfully/with reg")
     void driverVerify() {
-        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        OtpVerifyDTO dto = new OtpVerifyDTO(phone, "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
         when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(userDriver));
         when(driverRepository.findByPhone(dto.getPhone())).thenReturn(Optional.ofNullable(driver));
@@ -145,7 +149,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Passenger OTP verification successfully")
     void driverSignupVerify() {
-        OtpVerifyDTO dto = new OtpVerifyDTO("+94714461798", "123456");
+        OtpVerifyDTO dto = new OtpVerifyDTO(phone, "123456");
         when(redisUserRegRepository.findById(anyString())).thenReturn(Optional.ofNullable(userRegDriver));
         when(userRepository.findByPhoneAndSuspend(dto.getPhone(),false)).thenReturn(Optional.ofNullable(null));
         when(userRepository.save(any(User.class))).thenReturn(userDriver);
@@ -159,7 +163,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("Return Authentication object")
     void getAuthentication() {
-        String phone = "+94714461798";
         when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userPassenger));
 
         assertThat(userService.getAuthentication(phone)).isNotNull();
@@ -168,7 +171,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("Admin signup")
     void adminSignup() {
-        String phone = "+94714461798";
         String password = "password";
         when(userRepository.save(any(User.class))).thenReturn(userPassenger);
 
@@ -178,7 +180,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("Admin login")
     void adminLogin() {
-        String phone = "+94714461798";
         when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userDriver));
         when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
         AdminLoginResDTO data = userService.adminLogin(phone);
@@ -188,7 +189,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("OrgAdmin signup/success")
     void orgAdminSignup() {
-        OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", phone, "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
         when(orgAdminRepository.save(any(OrgAdmin.class))).thenReturn(orgAdmin);
 
         assertThat(userService.orgAdminSignup("ksr", "ksr@gmail.com","password","94714461798", "SF232","Kurunegala", "Adress").getEnabled()).isTrue();
@@ -197,7 +198,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("OrgAdmin login")
     void orgAdminLogin() {
-        String phone = "+94714461798";
         OrgAdmin orgAdmin = new OrgAdmin("ksr", "94714461798", "ksr@gmail.com", "SF232","Kurunegala", "Adress", true);
         when(userRepository.findByPhoneAndSuspend(phone,false)).thenReturn(Optional.ofNullable(userDriver));
         when(jwtService.createToken(anyString(), anyList())).thenReturn("Token");
@@ -206,5 +206,23 @@ public class UserServiceTest {
         OrgAdminLoginResDTO res = userService.orgAdminLogin(phone);
 
         assertThat(res.getToken()).isEqualTo("Token");
+    }
+
+    @Test
+    @DisplayName("Suspend user")
+    void suspend() {
+        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userDriver));
+        when(userRepository.save(any(User.class))).thenReturn(userDriver);
+        userDriver.setSuspend(true);
+        assertThat(userService.suspend(phone, true, Role.DRIVER).getSuspend()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Suspend user forbidden")
+    void suspendForbidden() {
+        when(userRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(userDriver));
+        userDriver.setSuspend(true);
+        assertThatThrownBy(()-> userService.suspend(phone, true, Role.PASSENGER))
+                .isInstanceOf(InvalidOperationException.class);
     }
 }

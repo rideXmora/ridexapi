@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -140,7 +141,7 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public PassengerVerifiedResDTO passengerVerification(String phone, String otp) {
+    public PassengerVerifiedResDTO passengerVerification(String phone, String otp) throws DuplicateKeyException {
         User user;
         Passenger passenger;
         if(!this.redisVerifyOtp(phone, Role.PASSENGER, otp))
@@ -172,7 +173,7 @@ public class UserService implements UserDetailsService {
         return response;
     }
 
-    public DriverVerifiedResDTO driverVerification(String phone, String otp) {
+    public DriverVerifiedResDTO driverVerification(String phone, String otp) throws DuplicateKeyException {
         User user;
         Driver driver;
         if(!this.redisVerifyOtp(phone, Role.DRIVER, otp))
@@ -252,5 +253,16 @@ public class UserService implements UserDetailsService {
         OrgAdminLoginResDTO response = modelMapper.map(orgAdmin, OrgAdminLoginResDTO.class);
         response.setToken(jwtService.createToken(phone, Arrays.asList(Role.ORG_ADMIN)));
         return response;
+    }
+
+    public User suspend(String phone, Boolean suspend, Role role) {
+        Optional<User> userOptional = userRepository.findByPhone(phone);
+        if(userOptional.isEmpty())
+            throw new EntityNotFoundException("Invalid phone number");
+        User user = userOptional.get();
+        if(!user.getRoles().contains(role))
+            throw new InvalidOperationException("Do not have permission");
+        user.setSuspend(suspend);
+        return userRepository.save(user);
     }
 }

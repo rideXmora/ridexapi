@@ -4,8 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ml.ridex.ridexapi.enums.Role;
+import ml.ridex.ridexapi.exception.EntityNotFoundException;
+import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.helper.PasswordGenerator;
 import ml.ridex.ridexapi.model.dto.AdminDTO;
+import ml.ridex.ridexapi.model.dto.UserDTO;
+import ml.ridex.ridexapi.model.dto.SuspendUserDTO;
 import ml.ridex.ridexapi.model.dto.OrgAdminRegDTO;
 import ml.ridex.ridexapi.model.dto.OrgAdminRegResDTO;
 import ml.ridex.ridexapi.service.EmailSender;
@@ -90,6 +95,24 @@ public class AdminController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exits");
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurred when sending the email");
+        }
+    }
+
+    @PostMapping("/passenger/suspend")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Un/Suspend passenger")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "change suspend status"),
+            @ApiResponse(responseCode = "403", description = "Do not have permission")
+    })
+    public UserDTO suspendPassenger(@Valid @RequestBody SuspendUserDTO data) {
+        try {
+            return modelMapper.map(userService.suspend(data.getPhone(),
+                    data.getSuspend(), Role.PASSENGER), UserDTO.class);
+        } catch(InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }
