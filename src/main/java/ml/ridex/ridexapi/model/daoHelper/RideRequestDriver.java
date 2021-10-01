@@ -8,6 +8,7 @@ import lombok.Data;
 public class RideRequestDriver {
     private String id;
     private String phone;
+    private String name;
     private RideRequestVehicle vehicle;
     private Double rating;
 }
