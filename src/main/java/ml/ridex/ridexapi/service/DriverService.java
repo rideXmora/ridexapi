@@ -9,6 +9,7 @@ import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
+import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.daoHelper.*;
 import ml.ridex.ridexapi.model.redis.DriverState;
 import ml.ridex.ridexapi.repository.DriverRepository;
@@ -38,6 +39,9 @@ public class DriverService {
 
     @Autowired
     private RedisDriverStateRepository redisDriverStateRepository;
+
+    @Autowired
+    private PassengerService passengerService;
 
     public Driver getDriver(String phone) {
         Optional<Driver> driverOptional = driverRepository.findByPhone(phone);
@@ -180,8 +184,8 @@ public class DriverService {
         if(rideOptional.isEmpty())
             throw new EntityNotFoundException("Invalid id");
         Ride ride = rideOptional.get();
-        if(ride.getRideStatus() == RideStatus.FINISHED)
-            throw new InvalidOperationException("Ride is already completed");
+        if(ride.getRideStatus() != RideStatus.DROPPED)
+            throw new InvalidOperationException("Can't finish the trip without completing");
         // Cost for the waiting time
         if(waitingTime >0) {
             OrgAdmin orgAdmin = this.getOrgAdmin(ride.getRideRequest().getOrganization().getId());
@@ -190,6 +194,11 @@ public class DriverService {
         ride.setRideStatus(rideStatus);
         ride.setDriverFeedback(driverFeedback);
         ride.setPassengerRating(passengerRating);
+
+        Passenger passenger = passengerService.getPassenger(ride.getRideRequest().getPassenger().getPhone());
+        passenger.setTotalRating(passenger.getTotalRating() + passengerRating);
+        passenger.setTotalRides(passenger.getTotalRides() + 1);
+        passengerService.savePassenger(passenger);
 
         return rideRepository.save(ride);
     }
