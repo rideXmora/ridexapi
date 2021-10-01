@@ -8,10 +8,7 @@ import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.RideRequest;
-import ml.ridex.ridexapi.model.dto.PassengerDTO;
-import ml.ridex.ridexapi.model.dto.PassengerProfileCompleteDTO;
-import ml.ridex.ridexapi.model.dto.RideRequestDTO;
-import ml.ridex.ridexapi.model.dto.RideRequestResDTO;
+import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.service.PassengerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +103,21 @@ public class PassengerController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (InvalidOperationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @PostMapping("/ride/getRide")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get ride")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Request created"),
+            @ApiResponse(responseCode = "400", description = "Database error")
+    })
+    public CommonRideDTO getRide(@Valid @RequestBody PassengerGetRideDTO data, Principal principal) {
+        try {
+            return modelMapper.map(passengerService.getRide(principal.getName(), data.getId()), CommonRideDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }
