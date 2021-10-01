@@ -29,8 +29,6 @@ public class DriverDTO {
 
     private Integer totalRides;
 
-    private List<String> pastRides;
-
     private Vehicle vehicle;
 
     private DriverOrganization driverOrganization;
