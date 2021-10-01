@@ -51,7 +51,7 @@ class DriverServiceTest {
     @BeforeEach
     void setup() {
         driverService = new DriverService();
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null, DriverStatus.OFFLINE,false);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null, DriverStatus.OFFLINE,false);
         phone = "+94714461798";
 
         ReflectionTestUtils.setField(driverService, "driverRepository", driverRepository);

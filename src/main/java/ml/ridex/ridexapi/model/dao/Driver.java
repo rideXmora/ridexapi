@@ -57,7 +57,6 @@ public class Driver {
             Integer sessionIncome,
             Integer totalRating,
             Integer totalRides,
-            List<RideSummary> pastRides,
             Vehicle vehicle,
             DriverOrganization driverOrganization,
             DriverStatus driverStatus,
@@ -71,7 +70,6 @@ public class Driver {
         this.totalIncome = totalIncome;
         this.sessionIncome = sessionIncome;
         this.totalRides = totalRides;
-        this.pastRides = pastRides;
         this.vehicle = vehicle;
         this.driverOrganization = driverOrganization;
         this.driverStatus = driverStatus;

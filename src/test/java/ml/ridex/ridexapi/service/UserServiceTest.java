@@ -74,7 +74,7 @@ public class UserServiceTest {
         userPassenger = new User("+94714461798", "password", Arrays.asList(Role.PASSENGER), Instant.now().getEpochSecond()+100000, true, false);
         userDriver = new User("+94714461798", "password", Arrays.asList(Role.DRIVER), Instant.now().getEpochSecond()+100000, true, false);
         passenger = new Passenger("94714461798", null, null, 0, 0, new ArrayList<>(),true);
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null, DriverStatus.OFFLINE,false);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null, DriverStatus.OFFLINE,false);
         userRegPassenger = new UserReg("+94714461798", Role.PASSENGER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
         userRegDriver = new UserReg("+94714461798", Role.DRIVER, "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", Instant.now().getEpochSecond()+300000);
         phone = "+94714461798";
