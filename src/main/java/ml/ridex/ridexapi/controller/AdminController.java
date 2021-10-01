@@ -121,6 +121,40 @@ public class AdminController {
         }
     }
 
+    @PostMapping("/driver/suspend")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Suspend Driver")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "change suspend status"),
+            @ApiResponse(responseCode = "403", description = "Do not have permission")
+    })
+    public UserDTO suspendDriver(@Valid @RequestBody SuspendUserDTO data) {
+        try {
+            return modelMapper.map(userService.suspend(data.getPhone(), data.getSuspend(), Role.DRIVER), UserDTO.class);
+        }catch(InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/orgAdmin/suspend")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Suspend OrgAdmin")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "change suspend status"),
+            @ApiResponse(responseCode = "403", description = "Do not have permission")
+    })
+    public UserDTO suspendOrgAdmin(@Valid @RequestBody SuspendUserDTO data) {
+        try {
+            return modelMapper.map(userService.suspend(data.getPhone(), data.getSuspend(), Role.ORG_ADMIN), UserDTO.class);
+        } catch(InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
     @GetMapping("/passenger/all")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all passengers")
@@ -140,39 +174,6 @@ public class AdminController {
     @Operation(summary = "Get all drivers")
     public List<OrgAdmin> getOrgAdminList() {
         return adminService.getOrgAdminList();
-    }
-
-    @PostMapping("/orgAdmin/suspend")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Suspend OrgAdmin")
-    public UserDTO suspendOrgAdmin(@Valid @RequestBody AdminSuspendDTO data) {
-        try {
-            return modelMapper.map(adminService.suspendUser(data.getPhone(), data.getSuspend(), Role.ORG_ADMIN), UserDTO.class);
-        } catch(InvalidOperationException | EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    @PostMapping("/driver/suspend")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Suspend Driver")
-    public UserDTO suspendDriver(@Valid @RequestBody AdminSuspendDTO data) {
-        try {
-            return modelMapper.map(adminService.suspendUser(data.getPhone(), data.getSuspend(), Role.DRIVER), UserDTO.class);
-        } catch(InvalidOperationException | EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    @PostMapping("/passenger/suspend")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Suspend passenger")
-    public UserDTO suspendPassenger(@Valid @RequestBody AdminSuspendDTO data) {
-        try {
-            return modelMapper.map(adminService.suspendUser(data.getPhone(), data.getSuspend(), Role.PASSENGER), UserDTO.class);
-        } catch(InvalidOperationException | EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
     }
 
     private DriverDTO convertToDriverDTO(Driver driver) {
