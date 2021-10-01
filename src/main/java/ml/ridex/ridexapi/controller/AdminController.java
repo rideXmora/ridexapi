@@ -8,11 +8,11 @@ import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.helper.PasswordGenerator;
-import ml.ridex.ridexapi.model.dto.AdminDTO;
-import ml.ridex.ridexapi.model.dto.UserDTO;
-import ml.ridex.ridexapi.model.dto.SuspendUserDTO;
-import ml.ridex.ridexapi.model.dto.OrgAdminRegDTO;
-import ml.ridex.ridexapi.model.dto.OrgAdminRegResDTO;
+import ml.ridex.ridexapi.model.dao.Driver;
+import ml.ridex.ridexapi.model.dao.OrgAdmin;
+import ml.ridex.ridexapi.model.dao.Passenger;
+import ml.ridex.ridexapi.model.dto.*;
+import ml.ridex.ridexapi.service.AdminService;
 import ml.ridex.ridexapi.service.EmailSender;
 import ml.ridex.ridexapi.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -27,7 +27,9 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -37,6 +39,9 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AdminService adminService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -114,5 +119,67 @@ public class AdminController {
         } catch(EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
+
+    @GetMapping("/passenger/all")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get all passengers")
+    public List<PassengerDTO> getPassengerList() {
+        return adminService.getPassengerList().stream().map(this::convertToPassengerDTO).collect(Collectors.toList());
+    }
+
+    @GetMapping("/driver/all")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get all drivers")
+    public List<DriverDTO> getDriverList() {
+        return adminService.getDriverList().stream().map(this::convertToDriverDTO).collect(Collectors.toList());
+    }
+
+    @GetMapping("/orgAdmin/all")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get all drivers")
+    public List<OrgAdmin> getOrgAdminList() {
+        return adminService.getOrgAdminList();
+    }
+
+    @PostMapping("/orgAdmin/suspend")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Suspend OrgAdmin")
+    public UserDTO suspendOrgAdmin(@Valid @RequestBody AdminSuspendDTO data) {
+        try {
+            return modelMapper.map(adminService.suspendUser(data.getPhone(), data.getSuspend(), Role.ORG_ADMIN), UserDTO.class);
+        } catch(InvalidOperationException | EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/driver/suspend")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Suspend Driver")
+    public UserDTO suspendDriver(@Valid @RequestBody AdminSuspendDTO data) {
+        try {
+            return modelMapper.map(adminService.suspendUser(data.getPhone(), data.getSuspend(), Role.DRIVER), UserDTO.class);
+        } catch(InvalidOperationException | EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/passenger/suspend")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Suspend passenger")
+    public UserDTO suspendPassenger(@Valid @RequestBody AdminSuspendDTO data) {
+        try {
+            return modelMapper.map(adminService.suspendUser(data.getPhone(), data.getSuspend(), Role.PASSENGER), UserDTO.class);
+        } catch(InvalidOperationException | EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    private DriverDTO convertToDriverDTO(Driver driver) {
+        return modelMapper.map(driver, DriverDTO.class);
+    }
+
+    private PassengerDTO convertToPassengerDTO(Passenger passenger) {
+        return modelMapper.map(passenger, PassengerDTO.class);
     }
 }
