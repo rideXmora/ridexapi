@@ -53,6 +53,10 @@ public class DriverService {
         return orgAdminOptional.get();
     }
 
+    public Driver saveDriver(Driver driver) {
+        return driverRepository.save(driver);
+    }
+
     public Driver profileComplete(
             String phone,
             String name,
