@@ -24,7 +24,5 @@ public class PassengerDTO {
 
     private Integer totalRides;
 
-    private List<String> pastRides;
-
     private Boolean enabled;
 }

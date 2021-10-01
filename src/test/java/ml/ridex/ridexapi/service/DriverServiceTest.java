@@ -51,7 +51,7 @@ class DriverServiceTest {
     @BeforeEach
     void setup() {
         driverService = new DriverService();
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null, DriverStatus.OFFLINE,false);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null, DriverStatus.OFFLINE,false);
         phone = "+94714461798";
         driverOrganization = new DriverOrganization();
         driverOrganization.setName("Uber");
@@ -128,7 +128,7 @@ class DriverServiceTest {
                 sl,
                 10000,
                 RideRequestStatus.PENDING,
-                new RideRequestDriver("idDr",phone, new RideRequestVehicle("Nw",VehicleType.CAR,"Nixxan"),12.78),
+                new RideRequestDriver("idDr",phone,"The rider", new RideRequestVehicle("Nw",VehicleType.CAR,"Nixxan"),12.78),
                 driverOrganization,
                 Instant.now().getEpochSecond());
         Ride ride = new Ride(rideRequest, "","", null,null,1222.4, RideStatus.ACCEPTED);

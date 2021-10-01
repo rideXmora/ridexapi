@@ -3,10 +3,12 @@ package ml.ridex.ridexapi.service;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
+import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.daoHelper.Payment;
 import ml.ridex.ridexapi.model.dto.OrgAdminPaymentDTO;
 import ml.ridex.ridexapi.repository.DriverRepository;
 import ml.ridex.ridexapi.repository.OrgAdminRepository;
+import ml.ridex.ridexapi.repository.RideRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,9 @@ public class OrgAdminService {
 
     @Autowired
     private DriverRepository driverRepository;
+
+    @Autowired
+    private RideRepository rideRepository;
 
     public OrgAdmin getOrgAdmin(String phone) {
         Optional<OrgAdmin> orgAdmin = orgAdminRepository.findByPhone(phone);
@@ -64,5 +69,9 @@ public class OrgAdminService {
         orgAdmin.setPayment(payment);
         orgAdminRepository.save(orgAdmin);
         return payment;
+    }
+
+    public List<Ride> getPastRides(String id) {
+        return rideRepository.findByRideRequestOrganizationId(id);
     }
 }

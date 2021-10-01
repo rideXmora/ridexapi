@@ -7,11 +7,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
+import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
-import ml.ridex.ridexapi.model.dto.PassengerDTO;
-import ml.ridex.ridexapi.model.dto.PassengerProfileCompleteDTO;
-import ml.ridex.ridexapi.model.dto.RideRequestDTO;
-import ml.ridex.ridexapi.model.dto.RideRequestResDTO;
+import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.service.PassengerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("hasAuthority('PASSENGER')")
@@ -107,5 +107,46 @@ public class PassengerController {
         } catch (InvalidOperationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
+    }
+
+    @PostMapping("/ride/getRide")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get ride")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Request created"),
+            @ApiResponse(responseCode = "400", description = "Database error")
+    })
+    public CommonRideDTO getRide(@Valid @RequestBody PassengerGetRideDTO data, Principal principal) {
+        try {
+            return modelMapper.map(passengerService.getRide(principal.getName(), data.getId()), CommonRideDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/ride/confirm")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get ride")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Request created"),
+            @ApiResponse(responseCode = "400", description = "Database error")
+    })
+    public CommonRideDTO confirmRide(@Valid @RequestBody PassengerConfirmRideDTO data, Principal principal) {
+        try {
+            return modelMapper.map(passengerService.confirmRide(principal.getName(), data.getId(), data.getPassengerFeedback(), data.getDriverRating()), CommonRideDTO.class);
+        } catch (EntityNotFoundException | InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @GetMapping("/ride/past")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get past ride")
+    public List<CommonRideDTO> pastRide(Principal principal) {
+        return passengerService.getPastRides(principal.getName()).stream().map(this::convertToCommonRideDTO).collect(Collectors.toList());
+    }
+
+    private CommonRideDTO convertToCommonRideDTO(Ride ride) {
+        return modelMapper.map(ride, CommonRideDTO.class);
     }
 }

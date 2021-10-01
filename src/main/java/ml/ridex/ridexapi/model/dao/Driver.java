@@ -9,8 +9,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 @Document
 @Getter
 @Setter
@@ -36,8 +34,6 @@ public class Driver {
 
     private Integer totalRides;
 
-    private List<String> pastRides;
-
     private Vehicle vehicle;
 
     private DriverOrganization driverOrganization;
@@ -56,7 +52,6 @@ public class Driver {
             Integer sessionIncome,
             Integer totalRating,
             Integer totalRides,
-            List<String> pastRides,
             Vehicle vehicle,
             DriverOrganization driverOrganization,
             DriverStatus driverStatus,
@@ -70,7 +65,6 @@ public class Driver {
         this.totalIncome = totalIncome;
         this.sessionIncome = sessionIncome;
         this.totalRides = totalRides;
-        this.pastRides = pastRides;
         this.vehicle = vehicle;
         this.driverOrganization = driverOrganization;
         this.driverStatus = driverStatus;

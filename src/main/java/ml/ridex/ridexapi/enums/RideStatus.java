@@ -5,5 +5,6 @@ public enum RideStatus {
     ARRIVED,
     PICKED,
     DROPPED,
-    FINISHED
+    FINISHED,
+    CONFIRMED
 }

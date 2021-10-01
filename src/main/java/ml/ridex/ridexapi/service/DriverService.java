@@ -9,6 +9,7 @@ import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
+import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.daoHelper.*;
 import ml.ridex.ridexapi.model.redis.DriverState;
 import ml.ridex.ridexapi.repository.DriverRepository;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,11 +41,25 @@ public class DriverService {
     @Autowired
     private RedisDriverStateRepository redisDriverStateRepository;
 
+    @Autowired
+    private PassengerService passengerService;
+
     public Driver getDriver(String phone) {
         Optional<Driver> driverOptional = driverRepository.findByPhone(phone);
         if(driverOptional.isEmpty())
             throw new EntityNotFoundException("User not found");
         return driverOptional.get();
+    }
+
+    public OrgAdmin getOrgAdmin(String id) {
+        Optional<OrgAdmin> orgAdminOptional = orgAdminRepository.findById(id);
+        if(orgAdminOptional.isEmpty())
+            throw new EntityNotFoundException("Invalid organizational id");
+        return orgAdminOptional.get();
+    }
+
+    public Driver saveDriver(Driver driver) {
+        return driverRepository.save(driver);
     }
 
     public Driver profileComplete(
@@ -95,6 +111,7 @@ public class DriverService {
         RideRequestDriver rideRequestDriver = new RideRequestDriver(
                 driver.getId(),
                 driver.getPhone(),
+                driver.getName(),
                 rideRequestVehicle,
                 (double) driver.getTotalRating()/totalRides);
 
@@ -102,11 +119,8 @@ public class DriverService {
         rideRequest.setOrganization(driver.getDriverOrganization());
         rideRequest.setDriver(rideRequestDriver);
 
-        // Payment cal method
-        Optional<OrgAdmin> orgAdminOptional = orgAdminRepository.findById(driver.getDriverOrganization().getId());
-        if(orgAdminOptional.isEmpty())
-            throw new EntityNotFoundException("Invalid organizational id");
-        OrgAdmin orgAdmin = orgAdminOptional.get();
+        OrgAdmin orgAdmin = this.getOrgAdmin(driver.getDriverOrganization().getId());
+
         if(orgAdmin.getPayment() == null)
             throw new InvalidOperationException("Organize has not complete the profile");
         // Cost calculation
@@ -161,14 +175,36 @@ public class DriverService {
         return rideRepository.save(ride);
     }
 
-    public Ride finishRide(String phone, String id, RideStatus rideStatus, Byte passengerRating, String driverFeedback) {
+    public Ride finishRide(String phone,
+                           String id,
+                           RideStatus rideStatus,
+                           Byte passengerRating,
+                           String driverFeedback,
+                           Integer waitingTime) throws EntityNotFoundException {
         Optional<Ride> rideOptional = rideRepository.findByIdAndRideRequestDriverPhone(id, phone);
         if(rideOptional.isEmpty())
             throw new EntityNotFoundException("Invalid id");
         Ride ride = rideOptional.get();
+        if(ride.getRideStatus() != RideStatus.DROPPED)
+            throw new InvalidOperationException("Can't finish the trip without completing");
+        // Cost for the waiting time
+        if(waitingTime >0) {
+            OrgAdmin orgAdmin = this.getOrgAdmin(ride.getRideRequest().getOrganization().getId());
+            ride.setPayment(ride.getPayment() + orgAdmin.getPayment().getRateWaitingPerMin()*waitingTime);
+        }
         ride.setRideStatus(rideStatus);
         ride.setDriverFeedback(driverFeedback);
         ride.setPassengerRating(passengerRating);
+
+        Passenger passenger = passengerService.getPassenger(ride.getRideRequest().getPassenger().getPhone());
+        passenger.setTotalRating(passenger.getTotalRating() + passengerRating);
+        passenger.setTotalRides(passenger.getTotalRides() + 1);
+        passengerService.savePassenger(passenger);
+
         return rideRepository.save(ride);
+    }
+
+    public List<Ride> getPastRides(String phone) {
+        return rideRepository.findByRideRequestAndRideRequestDriverPhone(phone, RideStatus.CONFIRMED);
     }
 }

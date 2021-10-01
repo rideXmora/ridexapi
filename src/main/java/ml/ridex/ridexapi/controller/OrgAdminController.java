@@ -9,6 +9,7 @@ import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
+import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dto.DriverDTO;
 import ml.ridex.ridexapi.model.dto.OrgAdminEnableDriver;
 import ml.ridex.ridexapi.model.dto.SuspendUserDTO;
@@ -121,6 +122,18 @@ public class OrgAdminController {
             return modelMapper.map(orgAdminService.setPayment(principal.getName(), data), OrgAdminPaymentDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        }
+    }
+
+    @GetMapping("/ride/past")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get past ride")
+    public List<Ride> pastRide(Principal principal) {
+        try {
+            OrgAdmin orgAdmin = orgAdminService.getOrgAdmin(principal.getName());
+            return orgAdminService.getPastRides(orgAdmin.getId());
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 

@@ -43,7 +43,7 @@ class OrgAdminServiceTest {
         orgAdminService = new OrgAdminService();
         phone = "+94714461798";
         orgAdmin = new OrgAdmin("ksr", phone,"ksr@gmail.com", "sadafd","Col","Address",null,true);
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null, DriverStatus.OFFLINE,false);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null, DriverStatus.OFFLINE,false);
         drivers = Arrays.asList(driver);
         ReflectionTestUtils.setField(orgAdminService, "orgAdminRepository", orgAdminRepository);
         ReflectionTestUtils.setField(orgAdminService, "driverRepository", driverRepository);

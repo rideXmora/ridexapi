@@ -1,18 +1,23 @@
 package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.RideRequestStatus;
+import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
+import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Passenger;
+import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
 import ml.ridex.ridexapi.model.daoHelper.Location;
 import ml.ridex.ridexapi.model.daoHelper.RideRequestPassenger;
 import ml.ridex.ridexapi.repository.PassengerRepository;
+import ml.ridex.ridexapi.repository.RideRepository;
 import ml.ridex.ridexapi.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,12 +28,22 @@ public class PassengerService {
     @Autowired
     private RideRequestRepository rideRequestRepository;
 
+    @Autowired
+    private RideRepository rideRepository;
+
+    @Autowired
+    private DriverService driverService;
+
     public Passenger getPassenger(String phone) {
         Optional<Passenger> passengerOptional = passengerRepository.findByPhone(phone);
         if(passengerOptional.isEmpty())
             throw new EntityNotFoundException("User not found");
         Passenger passenger = passengerOptional.get();
         return passenger;
+    }
+
+    public Passenger savePassenger(Passenger passenger) {
+        return passengerRepository.save(passenger);
     }
 
     public Passenger profileComplete(String phone, String email, String name) throws EntityNotFoundException, InvalidOperationException {
@@ -68,5 +83,32 @@ public class PassengerService {
                 Instant.now().getEpochSecond()
         );
         return rideRequestRepository.save(rideRequest);
+    }
+
+    public Ride getRide(String phone, String id) {
+        Optional<Ride> ride = rideRepository.findByIdAndRideRequestPassengerPhone(id, phone);
+        if(ride.isEmpty())
+            throw new EntityNotFoundException("Invalid id");
+        return ride.get();
+    }
+
+    public Ride confirmRide(String phone, String id, String passengerFeedback, Byte driverRating) throws EntityNotFoundException {
+        Ride ride = this.getRide(phone, id);
+        if(ride.getRideStatus() != RideStatus.FINISHED)
+            throw new InvalidOperationException("Wait until the ride complete");
+        ride.setRideStatus(RideStatus.CONFIRMED);
+        ride.setPassengerFeedback(passengerFeedback);
+        ride.setDriverRating(driverRating);
+
+        Driver driver = driverService.getDriver(ride.getRideRequest().getDriver().getPhone());
+        driver.setTotalRating(driver.getTotalRating() + driverRating);
+        driver.setTotalRides(driver.getTotalRides() + 1);
+        driverService.saveDriver(driver);
+
+        return rideRepository.save(ride);
+    }
+
+    public List<Ride> getPastRides(String phone) {
+        return rideRepository.findByRideStatusAndRideRequestPassengerPhone(phone, RideStatus.CONFIRMED);
     }
 }

@@ -6,8 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 @Document
 @Getter
 @Setter
@@ -25,8 +23,6 @@ public class Passenger {
 
     private Integer totalRides;
 
-    private List<String> pastRides;
-
     private Boolean enabled;
 
     public Passenger(String phone,
@@ -34,14 +30,12 @@ public class Passenger {
                      String name,
                      Integer totalRating,
                      Integer totalRides,
-                     List<String> pastRides,
                      Boolean enabled) {
         this.phone = phone;
         this.email = email;
         this.name = name;
         this.totalRating = totalRating;
         this.totalRides = totalRides;
-        this.pastRides = pastRides;
         this.enabled = enabled;
     }
 }

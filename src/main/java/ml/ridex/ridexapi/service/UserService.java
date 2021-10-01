@@ -167,7 +167,6 @@ public class UserService implements UserDetailsService {
                     null,
                     0,
                     0,
-                    new ArrayList<>(),
                     false
             ));
         }
@@ -203,7 +202,6 @@ public class UserService implements UserDetailsService {
                     0,
                     0,
                     0,
-                    new ArrayList<>(),
                     null,
                     null,
                     DriverStatus.OFFLINE,
