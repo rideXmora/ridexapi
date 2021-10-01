@@ -16,10 +16,6 @@ import java.util.Optional;
 
 @Service
 public class AdminService {
-
-    @Autowired
-    private UserRepository userRepository;
-
     @Autowired
     private PassengerRepository passengerRepository;
 
@@ -42,17 +38,5 @@ public class AdminService {
 
     public List<OrgAdmin> getOrgAdminList() {
         return orgAdminRepository.findAll();
-    }
-
-    public User suspendUser(String phone, Boolean suspend, Role role) {
-        Optional<User> userOptional = userRepository.findByPhone(phone);
-        if(userOptional.isEmpty())
-            throw new EntityNotFoundException("User not found");
-        User user = userOptional.get();
-        // Only allowing one end point to delete one type of users
-        if(!(user.getRoles().contains(role)))
-            throw new InvalidOperationException("Can't suspend user");
-        user.setSuspend(suspend);
-        return userRepository.save(user);
     }
 }
