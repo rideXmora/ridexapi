@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -105,5 +106,9 @@ public class PassengerService {
         driverService.saveDriver(driver);
 
         return rideRepository.save(ride);
+    }
+
+    public List<Ride> getPastRides(String phone) {
+        return rideRepository.findByRideStatusAndRideRequestPassengerPhone(phone, RideStatus.CONFIRMED);
     }
 }

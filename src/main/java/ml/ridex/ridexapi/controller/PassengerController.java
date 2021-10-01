@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
+import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
 import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.service.PassengerService;
@@ -19,6 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("hasAuthority('PASSENGER')")
@@ -134,5 +137,16 @@ public class PassengerController {
         } catch (EntityNotFoundException | InvalidOperationException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
+
+    @GetMapping("/ride/past")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get past ride")
+    public List<CommonRideDTO> pastRide(Principal principal) {
+        return passengerService.getPastRides(principal.getName()).stream().map(this::convertToCommonRideDTO).collect(Collectors.toList());
+    }
+
+    private CommonRideDTO convertToCommonRideDTO(Ride ride) {
+        return modelMapper.map(ride, CommonRideDTO.class);
     }
 }

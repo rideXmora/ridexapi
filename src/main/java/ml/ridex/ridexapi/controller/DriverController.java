@@ -23,6 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("hasAuthority('DRIVER')")
@@ -222,5 +224,16 @@ public class DriverController {
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
+
+    @GetMapping("/ride/past")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get past ride")
+    public List<CommonRideDTO> pastRide(Principal principal) {
+        return driverService.getPastRides(principal.getName()).stream().map(this::convertToCommonRideDTO).collect(Collectors.toList());
+    }
+
+    private CommonRideDTO convertToCommonRideDTO(Ride ride) {
+        return modelMapper.map(ride, CommonRideDTO.class);
     }
 }
