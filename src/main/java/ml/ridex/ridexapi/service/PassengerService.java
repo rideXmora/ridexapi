@@ -4,10 +4,12 @@ import ml.ridex.ridexapi.enums.RideRequestStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
+import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
 import ml.ridex.ridexapi.model.daoHelper.Location;
 import ml.ridex.ridexapi.model.daoHelper.RideRequestPassenger;
 import ml.ridex.ridexapi.repository.PassengerRepository;
+import ml.ridex.ridexapi.repository.RideRepository;
 import ml.ridex.ridexapi.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,9 @@ public class PassengerService {
 
     @Autowired
     private RideRequestRepository rideRequestRepository;
+
+    @Autowired
+    private RideRepository rideRepository;
 
     public Passenger getPassenger(String phone) {
         Optional<Passenger> passengerOptional = passengerRepository.findByPhone(phone);
@@ -68,5 +73,12 @@ public class PassengerService {
                 Instant.now().getEpochSecond()
         );
         return rideRequestRepository.save(rideRequest);
+    }
+
+    public Ride getRide(String phone, String id) {
+        Optional<Ride> ride = rideRepository.findByIdAndRideRequestPassengerPhone(id, phone);
+        if(ride.isEmpty())
+            throw new EntityNotFoundException("Invalid id");
+        return ride.get();
     }
 }
