@@ -131,7 +131,7 @@ public class PassengerController {
     public CommonRideDTO confirmRide(@Valid @RequestBody PassengerConfirmRideDTO data, Principal principal) {
         try {
             return modelMapper.map(passengerService.confirmRide(principal.getName(), data.getId(), data.getPassengerFeedback(), data.getDriverRating()), CommonRideDTO.class);
-        } catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException | InvalidOperationException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
