@@ -10,6 +10,7 @@ public class RideSummary {
     private String passenger;
     private String driver;
     private String organization;
-    private Double distance;
+    private Integer distance;
     private Double payment;
+    private long timestamp;
 }

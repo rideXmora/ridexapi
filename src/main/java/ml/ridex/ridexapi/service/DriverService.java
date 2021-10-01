@@ -170,11 +170,14 @@ public class DriverService {
                            RideStatus rideStatus,
                            Byte passengerRating,
                            String driverFeedback,
-                           Integer waitingTime) {
+                           Integer waitingTime) throws EntityNotFoundException {
         Optional<Ride> rideOptional = rideRepository.findByIdAndRideRequestDriverPhone(id, phone);
         if(rideOptional.isEmpty())
             throw new EntityNotFoundException("Invalid id");
         Ride ride = rideOptional.get();
+        if(ride.getRideStatus() == RideStatus.FINISHED)
+            throw new InvalidOperationException("Ride is already completed");
+        // Cost for the waiting time
         if(waitingTime >0) {
             OrgAdmin orgAdmin = this.getOrgAdmin(ride.getRideRequest().getOrganization().getId());
             ride.setPayment(ride.getPayment() + orgAdmin.getPayment().getRateWaitingPerMin()*waitingTime);
@@ -182,6 +185,18 @@ public class DriverService {
         ride.setRideStatus(rideStatus);
         ride.setDriverFeedback(driverFeedback);
         ride.setPassengerRating(passengerRating);
+
+        Driver driver = this.getDriver(phone);
+        RideSummary rideSummary = new RideSummary(
+                id,
+                ride.getRideRequest().getPassenger().getName(),
+                ride.getRideRequest().getDriver().getPhone(),
+                ride.getRideRequest().getOrganization().getName(),
+                ride.getRideRequest().getDistance(),
+                ride.getPayment(),
+                ride.getRideRequest().getTimestamp());
+        driver.getPastRides().add(rideSummary);
+        driverRepository.save(driver);
         return rideRepository.save(ride);
     }
 }
