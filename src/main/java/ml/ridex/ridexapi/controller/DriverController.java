@@ -103,10 +103,10 @@ public class DriverController {
             @ApiResponse(responseCode = "200", description = "Accepted"),
             @ApiResponse(responseCode = "400", description = "User not found"),
     })
-    public DriverRideDTO acceptRideRequest(@Valid @RequestBody RideRequestAcceptDTO data, Principal principal) {
+    public CommonRideDTO acceptRideRequest(@Valid @RequestBody RideRequestAcceptDTO data, Principal principal) {
         try {
             Ride ride = driverService.acceptRideRequest(principal.getName(), data.getId());
-            return modelMapper.map(ride, DriverRideDTO.class);
+            return modelMapper.map(ride, CommonRideDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -153,13 +153,13 @@ public class DriverController {
             @ApiResponse(responseCode = "200", description = "Driver arrived"),
             @ApiResponse(responseCode = "400", description = "Invalid id or user")
     })
-    public DriverRideDTO rideArrived(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
+    public CommonRideDTO rideArrived(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
         try {
             return modelMapper.map(driverService.changeRideStatus(
                     principal.getName(),
                     data.getId(),
                     RideStatus.ARRIVED)
-            ,DriverRideDTO.class);
+            , CommonRideDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -172,13 +172,13 @@ public class DriverController {
             @ApiResponse(responseCode = "200", description = "Driver picked the passenger"),
             @ApiResponse(responseCode = "400", description = "Invalid id or user")
     })
-    public DriverRideDTO ridePicked(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
+    public CommonRideDTO ridePicked(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
         try {
             return modelMapper.map(driverService.changeRideStatus(
                     principal.getName(),
                     data.getId(),
                     RideStatus.PICKED)
-            ,DriverRideDTO.class);
+            , CommonRideDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -191,13 +191,13 @@ public class DriverController {
             @ApiResponse(responseCode = "200", description = "Dropped"),
             @ApiResponse(responseCode = "400", description = "Invalid id or user")
     })
-    public DriverRideDTO rideDropped(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
+    public CommonRideDTO rideDropped(@Valid @RequestBody DriverRideStatusChangeDTO data, Principal principal) {
         try {
             return modelMapper.map(driverService.changeRideStatus(
                     principal.getName(),
                     data.getId(),
                     RideStatus.DROPPED)
-                    ,DriverRideDTO.class);
+                    , CommonRideDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -210,7 +210,7 @@ public class DriverController {
             @ApiResponse(responseCode = "200", description = "Finished"),
             @ApiResponse(responseCode = "400", description = "Invalid id or user")
     })
-    public DriverRideDTO rideFinished(@Valid @RequestBody DriverRideFinishDTO data, Principal principal) {
+    public CommonRideDTO rideFinished(@Valid @RequestBody DriverRideFinishDTO data, Principal principal) {
         try {
             return modelMapper.map(driverService.finishRide(principal.getName(),
                     data.getId(),
@@ -218,7 +218,7 @@ public class DriverController {
                     data.getPassengerRating(),
                     data.getDriverFeedback(),
                     data.getWaitingTime())
-            ,DriverRideDTO.class);
+            , CommonRideDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

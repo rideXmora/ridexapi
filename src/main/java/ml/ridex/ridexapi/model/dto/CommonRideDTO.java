@@ -5,7 +5,7 @@ import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.model.dao.RideRequest;
 
 @Data
-public class DriverRideDTO {
+public class CommonRideDTO {
     private String id;
 
     private RideRequest rideRequest;
