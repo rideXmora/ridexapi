@@ -4,6 +4,7 @@ import ml.ridex.ridexapi.enums.RideRequestStatus;
 import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
+import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
@@ -28,6 +29,9 @@ public class PassengerService {
 
     @Autowired
     private RideRepository rideRepository;
+
+    @Autowired
+    private DriverService driverService;
 
     public Passenger getPassenger(String phone) {
         Optional<Passenger> passengerOptional = passengerRepository.findByPhone(phone);
@@ -90,6 +94,11 @@ public class PassengerService {
         ride.setRideStatus(RideStatus.CONFIRMED);
         ride.setPassengerFeedback(passengerFeedback);
         ride.setDriverRating(driverRating);
+
+        Driver driver = driverService.getDriver(ride.getRideRequest().getDriver().getPhone());
+        driver.setTotalRating(driver.getTotalRating() + driverRating);
+        driver.setTotalRides(driver.getTotalRides() + 1);
+        driverService.saveDriver(driver);
 
         return rideRepository.save(ride);
     }
