@@ -1,6 +1,7 @@
 package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.RideRequestStatus;
+import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
@@ -80,5 +81,16 @@ public class PassengerService {
         if(ride.isEmpty())
             throw new EntityNotFoundException("Invalid id");
         return ride.get();
+    }
+
+    public Ride confirmRide(String phone, String id, String passengerFeedback, Byte driverRating) throws EntityNotFoundException {
+        Ride ride = this.getRide(phone, id);
+        if(ride.getRideStatus() != RideStatus.FINISHED)
+            throw new InvalidOperationException("Wait until the ride complete");
+        ride.setRideStatus(RideStatus.CONFIRMED);
+        ride.setPassengerFeedback(passengerFeedback);
+        ride.setDriverRating(driverRating);
+
+        return rideRepository.save(ride);
     }
 }
