@@ -187,15 +187,6 @@ public class DriverService {
         ride.setPassengerRating(passengerRating);
 
         Driver driver = this.getDriver(phone);
-        RideSummary rideSummary = new RideSummary(
-                id,
-                ride.getRideRequest().getPassenger().getName(),
-                ride.getRideRequest().getDriver().getPhone(),
-                ride.getRideRequest().getOrganization().getName(),
-                ride.getRideRequest().getDistance(),
-                ride.getPayment(),
-                ride.getRideRequest().getTimestamp());
-        driver.getPastRides().add(rideSummary);
         driverRepository.save(driver);
         return rideRepository.save(ride);
     }
