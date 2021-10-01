@@ -41,6 +41,10 @@ public class PassengerService {
         return passenger;
     }
 
+    public Passenger savePassenger(Passenger passenger) {
+        return passengerRepository.save(passenger);
+    }
+
     public Passenger profileComplete(String phone, String email, String name) throws EntityNotFoundException, InvalidOperationException {
         Passenger passenger = this.getPassenger(phone);
         passenger.setEmail(email);
