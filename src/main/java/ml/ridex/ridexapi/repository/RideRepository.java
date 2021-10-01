@@ -9,4 +9,7 @@ import java.util.Optional;
 public interface RideRepository extends MongoRepository<Ride, String> {
     @Query("{ '_id': ObjectId(?0), 'rideRequest.driver.phone': ?1 }")
     public Optional<Ride> findByIdAndRideRequestDriverPhone(String id, String phone);
+
+    @Query("{ '_id': ObjectId(?0), 'rideRequest.passenger.phone': ?1 }")
+    public Optional<Ride> findByIdAndRideRequestPassengerPhone(String id, String phone);
 }
