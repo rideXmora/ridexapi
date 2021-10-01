@@ -47,13 +47,15 @@ class DriverServiceTest {
 
     Driver driver;
     String phone;
-
+    DriverOrganization driverOrganization;
     @BeforeEach
     void setup() {
         driverService = new DriverService();
         driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, new ArrayList<>(), null, null, DriverStatus.OFFLINE,false);
         phone = "+94714461798";
-
+        driverOrganization = new DriverOrganization();
+        driverOrganization.setName("Uber");
+        driverOrganization.setId("OrgId");
         ReflectionTestUtils.setField(driverService, "driverRepository", driverRepository);
         ReflectionTestUtils.setField(driverService, "rideRepository", rideRepository);
         ReflectionTestUtils.setField(driverService, "rideRequestRepository", rideRequestRepository);
@@ -118,7 +120,7 @@ class DriverServiceTest {
 
         driver.setVehicle(vehicle);
         driver.setEnabled(true);
-        driver.setDriverOrganization(new DriverOrganization("OrgId", "Uber"));
+        driver.setDriverOrganization(driverOrganization);
         Location sl = new Location(1.32432,121.12312);
         RideRequest rideRequest = new RideRequest(
                 new RideRequestPassenger("id",phone,"ksr",12.2),
@@ -127,7 +129,7 @@ class DriverServiceTest {
                 10000,
                 RideRequestStatus.PENDING,
                 new RideRequestDriver("idDr",phone, new RideRequestVehicle("Nw",VehicleType.CAR,"Nixxan"),12.78),
-                new DriverOrganization("id3","nameOrg"),
+                driverOrganization,
                 Instant.now().getEpochSecond());
         Ride ride = new Ride(rideRequest, "","", null,null,1222.4, RideStatus.ACCEPTED);
         when(rideRequestRepository.findById(anyString())).thenReturn(Optional.of(rideRequest));
