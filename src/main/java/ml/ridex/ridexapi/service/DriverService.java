@@ -102,6 +102,7 @@ public class DriverService {
         RideRequestDriver rideRequestDriver = new RideRequestDriver(
                 driver.getId(),
                 driver.getPhone(),
+                driver.getName(),
                 rideRequestVehicle,
                 (double) driver.getTotalRating()/totalRides);
 
@@ -185,7 +186,7 @@ public class DriverService {
         ride.setRideStatus(rideStatus);
         ride.setDriverFeedback(driverFeedback);
         ride.setPassengerRating(passengerRating);
-        
+
         return rideRepository.save(ride);
     }
 }

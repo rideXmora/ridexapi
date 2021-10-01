@@ -126,7 +126,7 @@ class DriverServiceTest {
                 sl,
                 10000,
                 RideRequestStatus.PENDING,
-                new RideRequestDriver("idDr",phone, new RideRequestVehicle("Nw",VehicleType.CAR,"Nixxan"),12.78),
+                new RideRequestDriver("idDr",phone,"The rider", new RideRequestVehicle("Nw",VehicleType.CAR,"Nixxan"),12.78),
                 new DriverOrganization("id3","nameOrg"),
                 Instant.now().getEpochSecond());
         Ride ride = new Ride(rideRequest, "","", null,null,1222.4, RideStatus.ACCEPTED);
