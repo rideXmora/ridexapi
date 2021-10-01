@@ -167,7 +167,6 @@ public class UserService implements UserDetailsService {
                     null,
                     0,
                     0,
-                    new ArrayList<>(),
                     false
             ));
         }

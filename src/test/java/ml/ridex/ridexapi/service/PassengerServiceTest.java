@@ -42,7 +42,7 @@ class PassengerServiceTest {
     @BeforeEach
     void setUp() {
         passengerService = new PassengerService();
-        passenger = new Passenger("94714461798", null, null, 0, 0, new ArrayList<>(),true);
+        passenger = new Passenger("94714461798", null, null, 0, 0,true);
         phone = "+94714461798";
 
         ReflectionTestUtils.setField(passengerService, "passengerRepository", passengerRepository);

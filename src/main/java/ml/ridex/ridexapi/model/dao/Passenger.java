@@ -26,8 +26,6 @@ public class Passenger {
 
     private Integer totalRides;
 
-    private List<RideSummary> pastRides;
-
     private Boolean enabled;
 
     public Passenger(String phone,
@@ -35,14 +33,12 @@ public class Passenger {
                      String name,
                      Integer totalRating,
                      Integer totalRides,
-                     List<RideSummary> pastRides,
                      Boolean enabled) {
         this.phone = phone;
         this.email = email;
         this.name = name;
         this.totalRating = totalRating;
         this.totalRides = totalRides;
-        this.pastRides = pastRides;
         this.enabled = enabled;
     }
 }
