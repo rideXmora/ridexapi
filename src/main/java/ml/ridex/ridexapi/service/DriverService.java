@@ -185,9 +185,7 @@ public class DriverService {
         ride.setRideStatus(rideStatus);
         ride.setDriverFeedback(driverFeedback);
         ride.setPassengerRating(passengerRating);
-
-        Driver driver = this.getDriver(phone);
-        driverRepository.save(driver);
+        
         return rideRepository.save(ride);
     }
 }
