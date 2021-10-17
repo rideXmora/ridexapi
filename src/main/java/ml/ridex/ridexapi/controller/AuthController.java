@@ -76,7 +76,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "return new JWT token"),
             @ApiResponse(responseCode = "401", description = "Invalid token or refresh token"),
     })
-    public RefreshTokenResDTO passengerRefreshToken(@Valid @RequestBody RefreshTokenReqDTO data, Principal principal) {
+    public RefreshTokenResDTO passengerRefreshToken(@Valid @RequestBody RefreshTokenReqDTO data) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.getPhone(), data.getRefreshToken()));
             return new RefreshTokenResDTO(userService.refreshToken(data.getPhone(), data.getToken(), Role.PASSENGER));
@@ -128,7 +128,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "return new JWT token"),
             @ApiResponse(responseCode = "401", description = "Invalid token or refresh token"),
     })
-    public RefreshTokenResDTO driverRefreshToken(@Valid @RequestBody RefreshTokenReqDTO data, Principal principal) {
+    public RefreshTokenResDTO driverRefreshToken(@Valid @RequestBody RefreshTokenReqDTO data) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.getPhone(), data.getRefreshToken()));
             return new RefreshTokenResDTO(userService.refreshToken(data.getPhone(), data.getToken(), Role.DRIVER));
