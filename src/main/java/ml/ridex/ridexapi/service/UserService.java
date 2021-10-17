@@ -176,6 +176,13 @@ public class UserService implements UserDetailsService {
         return response;
     }
 
+    public String refreshToken(String phone, String token, Role role) {
+        if (jwtService.validateToken(token)){
+            return token;
+        }
+        return jwtService.createToken(phone, Arrays.asList(role));
+    }
+
     public DriverVerifiedResDTO driverVerification(String phone, String otp) throws DuplicateKeyException {
         User user;
         Driver driver;
