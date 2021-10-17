@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
+import ml.ridex.ridexapi.helper.CustomStompSessionHandler;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dao.RideRequest;
@@ -14,13 +15,21 @@ import ml.ridex.ridexapi.service.PassengerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.socket.client.WebSocketClient;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @RestController
@@ -144,6 +153,27 @@ public class PassengerController {
     @Operation(summary = "Get past ride")
     public List<CommonRideDTO> pastRide(Principal principal) {
         return passengerService.getPastRides(principal.getName()).stream().map(this::convertToCommonRideDTO).collect(Collectors.toList());
+    }
+
+    @GetMapping("/test")
+    public WSMessageDTO test() throws ExecutionException, InterruptedException {
+        WSMessageDTO data = new WSMessageDTO();
+        data.setMessage("Hello drivers");
+        WebSocketClient client = new StandardWebSocketClient();
+
+        WebSocketStompClient stompClient = new WebSocketStompClient(client);
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        StompSessionHandler sessionHandler = new CustomStompSessionHandler();
+        stompClient.connect("ws://localhost:8080/ws", sessionHandler);
+        new Scanner(System.in).nextLine(); // Don't close immediately.
+
+//        StompSessionHandler sessionHandler = new CustomStompSessionHandler();
+//
+//        StompSession stompSession = stompClient.connect("ws://localhost:8080/ws",
+//                sessionHandler).get();
+//        stompSession.send("ride/request", data);
+        return data;
     }
 
     private CommonRideDTO convertToCommonRideDTO(Ride ride) {
