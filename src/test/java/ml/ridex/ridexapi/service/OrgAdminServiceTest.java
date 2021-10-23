@@ -1,6 +1,7 @@
 package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.DriverStatus;
+import ml.ridex.ridexapi.enums.VehicleType;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.daoHelper.Payment;
@@ -81,39 +82,43 @@ class OrgAdminServiceTest {
         when(orgAdminRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(orgAdmin));
         when(orgAdminRepository.save(any(OrgAdmin.class))).thenReturn(orgAdmin);
         OrgAdminPaymentDTO payment = new OrgAdminPaymentDTO();
+        payment.setVehicleType(VehicleType.THREE_WHEELER);
         payment.setRatePerMeter(1000.0);
         payment.setRateWaitingPerMin(10.1);
         payment.setDiscount(12.0);
 
-        Payment res = orgAdminService.setPayment(phone, payment);
+        List<Payment> res = orgAdminService.setPayment(phone, Arrays.asList(payment));
 
-        assertThat(res.getRatePerMeter()).isEqualTo(1000.0);
+        assertThat(res.get(0).getRatePerMeter()).isEqualTo(1000.0);
     }
 
     @Test
     @DisplayName("set payment for the first time")
     void setPaymentUpdate() {
         Payment paymentBefore = new Payment();
+        paymentBefore.setVehicleType(VehicleType.THREE_WHEELER);
         paymentBefore.setRatePerMeter(1000.0);
         paymentBefore.setRateWaitingPerMin(10.1);
 
         OrgAdminPaymentDTO paymentData = new OrgAdminPaymentDTO();
+        paymentData.setVehicleType(VehicleType.THREE_WHEELER);
         paymentData.setRatePerMeter(1000.0);
         paymentData.setRateWaitingPerMin(10.1);
         paymentData.setDiscount(12.0);
 
         Payment paymentAfter = new Payment();
+        paymentAfter.setVehicleType(VehicleType.THREE_WHEELER);
         paymentAfter.setRatePerMeter(1000.0);
         paymentAfter.setRateWaitingPerMin(10.1);
         paymentAfter.setDiscount(12.0);
 
-        orgAdmin.setPayment(paymentBefore);
+        orgAdmin.setPayments(Arrays.asList(paymentBefore));
 
         when(orgAdminRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(orgAdmin));
         when(orgAdminRepository.save(any(OrgAdmin.class))).thenReturn(orgAdmin);
 
-        Payment res = orgAdminService.setPayment(phone, paymentData);
+        List<Payment> res = orgAdminService.setPayment(phone, Arrays.asList(paymentData));
 
-        assertThat(res.getDiscount()).isEqualTo(12.0);
+        assertThat(res.get(0).getDiscount()).isEqualTo(12.0);
     }
 }

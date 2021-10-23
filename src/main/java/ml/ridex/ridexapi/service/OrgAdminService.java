@@ -12,6 +12,7 @@ import ml.ridex.ridexapi.repository.RideRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,25 +51,36 @@ public class OrgAdminService {
         return driverRepository.save(driver);
     }
 
-    public Payment setPayment(String phone, OrgAdminPaymentDTO data) throws EntityNotFoundException {
+    public List<Payment> setPayment(String phone, List<OrgAdminPaymentDTO> data) throws EntityNotFoundException {
         OrgAdmin orgAdmin = getOrgAdmin(phone);
-        Payment payment;
-        if(orgAdmin.getPayment() == null) {
-            payment = new Payment();
-            payment.setDiscount(0.0);
+        List<Payment> payments;
+        if(orgAdmin.getPayments() == null) {
+            payments = new ArrayList<>();
+            //payment.setDiscount(0.0);
         }
         else
-            payment = orgAdmin.getPayment();
+            payments = orgAdmin.getPayments();
 
-        if(data.getRatePerMeter() != null)
-            payment.setRatePerMeter(data.getRatePerMeter());
-        if(data.getRateWaitingPerMin() != null)
-            payment.setRateWaitingPerMin(data.getRateWaitingPerMin());
-        if(data.getDiscount() != null)
-            payment.setDiscount(data.getDiscount());
-        orgAdmin.setPayment(payment);
+        for(OrgAdminPaymentDTO dto: data){
+            Payment payment = payments.stream()
+                    .filter(p -> p.getVehicleType().equals(dto.getVehicleType())).findAny().orElse(null);
+            if(payment == null) {
+                payment = new Payment();
+                payment.setVehicleType(dto.getVehicleType());
+                payment.setDiscount(0.0);
+                payments.add(payment);
+            }
+            if(dto.getRatePerMeter() != null)
+                payment.setRatePerMeter(dto.getRatePerMeter());
+            if(dto.getRateWaitingPerMin() != null)
+                payment.setRateWaitingPerMin(dto.getRateWaitingPerMin());
+            if(dto.getDiscount() != null)
+                payment.setDiscount(dto.getDiscount());
+        }
+
+        orgAdmin.setPayments(payments);
         orgAdminRepository.save(orgAdmin);
-        return payment;
+        return payments;
     }
 
     public List<Ride> getPastRides(String id) {
