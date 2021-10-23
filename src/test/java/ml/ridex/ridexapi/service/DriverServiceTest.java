@@ -22,6 +22,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -112,11 +113,12 @@ class DriverServiceTest {
         Vehicle vehicle = new Vehicle("NW1231", VehicleType.CAR,"Alto","dsfsd","ins", "124");
 
         Payment payment = new Payment();
+        payment.setVehicleType(VehicleType.CAR);
         payment.setRatePerMeter(1000.0);
         payment.setRateWaitingPerMin(10.1);
         payment.setDiscount(12.0);
 
-        orgAdmin.setPayment(payment);
+        orgAdmin.setPayments(Arrays.asList(payment));
 
         driver.setVehicle(vehicle);
         driver.setEnabled(true);
