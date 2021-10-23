@@ -10,6 +10,7 @@ import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
+import ml.ridex.ridexapi.model.daoHelper.Payment;
 import ml.ridex.ridexapi.model.dto.DriverDTO;
 import ml.ridex.ridexapi.model.dto.OrgAdminEnableDriver;
 import ml.ridex.ridexapi.model.dto.SuspendUserDTO;
@@ -117,9 +118,10 @@ public class OrgAdminController {
             @ApiResponse(responseCode = "200", description = "payment added/ updated"),
             @ApiResponse(responseCode = "400", description = "User not found")
     })
-    public OrgAdminPaymentDTO setPayment(@Valid @RequestBody OrgAdminPaymentDTO data, Principal principal) {
+    public List<OrgAdminPaymentDTO> setPayment(@Valid @RequestBody List<OrgAdminPaymentDTO> data, Principal principal) {
         try {
-            return modelMapper.map(orgAdminService.setPayment(principal.getName(), data), OrgAdminPaymentDTO.class);
+            return orgAdminService.setPayment(principal.getName(), data)
+                    .stream().map(this::convertToOrgAdminPaymentDTO).collect(Collectors.toList());
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
@@ -140,4 +142,6 @@ public class OrgAdminController {
     private DriverDTO convertToDriverDTO(Driver driver) {
         return modelMapper.map(driver, DriverDTO.class);
     }
+
+    private OrgAdminPaymentDTO convertToOrgAdminPaymentDTO(Payment payment) { return modelMapper.map(payment, OrgAdminPaymentDTO.class); }
 }
