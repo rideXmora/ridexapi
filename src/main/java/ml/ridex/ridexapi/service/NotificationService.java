@@ -32,7 +32,7 @@ public class NotificationService {
                     .setCredentials(GoogleCredentials.fromStream(new ClassPathResource(firebaseConfig).getInputStream())).build();
 
             if(FirebaseApp.getApps().isEmpty()) {
-                this.firebaseApp = FirebaseApp.initializeApp();
+                this.firebaseApp = FirebaseApp.initializeApp(options);
             } else {
                 this.firebaseApp = FirebaseApp.getInstance();
             }
