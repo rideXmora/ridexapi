@@ -100,6 +100,7 @@ public class UserService implements UserDetailsService {
         if(userReg.getExp() < Instant.now().getEpochSecond())
             throw new InvalidOperationException("OTP expired");
         CustomHash hash = new CustomHash(otp);
+        redisUserRegRepository.deleteById(phone);
         return hash.verifyHash(userReg.getOtpHash());
     }
 
