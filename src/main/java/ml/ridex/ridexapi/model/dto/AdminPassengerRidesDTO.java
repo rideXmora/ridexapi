@@ -1,2 +1,13 @@
-package ml.ridex.ridexapi.model.dto;public class AdminPassengerRidesDTO {
+package ml.ridex.ridexapi.model.dto;
+
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
+@Data
+public class AdminPassengerRidesDTO {
+    @NotBlank
+    @Pattern(regexp="(\\+94\\d{9})")
+    private String phone;
 }
