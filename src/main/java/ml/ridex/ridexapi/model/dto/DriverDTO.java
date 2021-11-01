@@ -37,4 +37,6 @@ public class DriverDTO {
 
     private Boolean enabled;
 
+    private Boolean suspend;
+
 }
