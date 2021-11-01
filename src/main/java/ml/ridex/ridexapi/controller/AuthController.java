@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.security.InvalidKeyException;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -68,6 +69,22 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/passenger/refreshToken")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Refresh token/passenger")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "return new JWT token"),
+            @ApiResponse(responseCode = "401", description = "Invalid token or refresh token"),
+    })
+    public RefreshTokenResDTO passengerRefreshToken(@Valid @RequestBody RefreshTokenReqDTO data) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.getPhone(), data.getRefreshToken()));
+            return new RefreshTokenResDTO(userService.refreshToken(data.getPhone(), data.getToken(), Role.PASSENGER));
+        } catch (InvalidOperationException | AuthenticationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
     @PostMapping("/driver/phoneAuth")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Send OTP/driver")
@@ -101,6 +118,22 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         } catch (DuplicateKeyException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is suspended");
+        }
+    }
+
+    @PostMapping("/driver/refreshToken")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Refresh token/driver")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "return new JWT token"),
+            @ApiResponse(responseCode = "401", description = "Invalid token or refresh token"),
+    })
+    public RefreshTokenResDTO driverRefreshToken(@Valid @RequestBody RefreshTokenReqDTO data) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.getPhone(), data.getRefreshToken()));
+            return new RefreshTokenResDTO(userService.refreshToken(data.getPhone(), data.getToken(), Role.DRIVER));
+        } catch (InvalidOperationException | AuthenticationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 

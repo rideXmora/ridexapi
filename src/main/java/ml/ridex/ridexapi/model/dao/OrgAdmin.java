@@ -5,6 +5,8 @@ import ml.ridex.ridexapi.model.daoHelper.Payment;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document
 @Data
 public class OrgAdmin {
@@ -23,7 +25,7 @@ public class OrgAdmin {
 
     private String address;
 
-    private Payment payment;
+    private List<Payment> payments;
 
     private Boolean enabled;
 
@@ -34,7 +36,7 @@ public class OrgAdmin {
             String businessRegNo,
             String basedCity,
             String address,
-            Payment payment,
+            List<Payment> payments,
             Boolean enabled) {
         this.name = name;
         this.phone = phone;
@@ -42,7 +44,7 @@ public class OrgAdmin {
         this.businessRegNo = businessRegNo;
         this.basedCity = basedCity;
         this.address = address;
-        this.payment = payment;
+        this.payments = payments;
         this.enabled = enabled;
     }
 }

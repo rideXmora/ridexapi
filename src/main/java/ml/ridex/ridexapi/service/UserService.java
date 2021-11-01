@@ -100,6 +100,7 @@ public class UserService implements UserDetailsService {
         if(userReg.getExp() < Instant.now().getEpochSecond())
             throw new InvalidOperationException("OTP expired");
         CustomHash hash = new CustomHash(otp);
+        redisUserRegRepository.deleteById(phone);
         return hash.verifyHash(userReg.getOtpHash());
     }
 
@@ -174,6 +175,13 @@ public class UserService implements UserDetailsService {
         response.setToken(jwtService.createToken(phone, Arrays.asList(Role.PASSENGER)));
         response.setRefreshToken(refreshToken);
         return response;
+    }
+
+    public String refreshToken(String phone, String token, Role role) {
+        if (jwtService.validateToken(token)){
+            return token;
+        }
+        return jwtService.createToken(phone, Arrays.asList(role));
     }
 
     public DriverVerifiedResDTO driverVerification(String phone, String otp) throws DuplicateKeyException {

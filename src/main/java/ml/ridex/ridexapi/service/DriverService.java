@@ -121,12 +121,18 @@ public class DriverService {
 
         OrgAdmin orgAdmin = this.getOrgAdmin(driver.getDriverOrganization().getId());
 
-        if(orgAdmin.getPayment() == null)
+        if(orgAdmin.getPayments() == null)
             throw new InvalidOperationException("Organize has not complete the profile");
+
+        Payment payment = orgAdmin.getPayments().stream()
+                .filter(p -> p.getVehicleType().equals(driver.getVehicle().getVehicleType()))
+                .findAny().orElse(null);
+        if(payment == null)
+            throw new InvalidOperationException("Vehicle type not allowed in this org");
         // Cost calculation
         Double cost = rideRequest.getDistance()
-                *orgAdmin.getPayment().getRatePerMeter()
-                *(100-orgAdmin.getPayment().getDiscount())/100;
+                *payment.getRatePerMeter()
+                *(100-payment.getDiscount())/100;
 
         // update ride rideRequest
         rideRequestRepository.save(rideRequest);
@@ -190,7 +196,10 @@ public class DriverService {
         // Cost for the waiting time
         if(waitingTime >0) {
             OrgAdmin orgAdmin = this.getOrgAdmin(ride.getRideRequest().getOrganization().getId());
-            ride.setPayment(ride.getPayment() + orgAdmin.getPayment().getRateWaitingPerMin()*waitingTime);
+            Payment payment = orgAdmin.getPayments().stream()
+                    .filter(p -> p.getVehicleType().equals(ride.getRideRequest().getDriver().getVehicle().getVehicleType()))
+                    .findAny().get();
+            ride.setPayment(ride.getPayment() + payment.getRateWaitingPerMin()*waitingTime);
         }
         ride.setRideStatus(rideStatus);
         ride.setDriverFeedback(driverFeedback);
