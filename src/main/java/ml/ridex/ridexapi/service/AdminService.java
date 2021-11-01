@@ -7,6 +7,7 @@ import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.User;
+import ml.ridex.ridexapi.model.dto.DriverDTO;
 import ml.ridex.ridexapi.model.dto.PassengerDTO;
 import ml.ridex.ridexapi.repository.*;
 import org.modelmapper.ModelMapper;
@@ -52,8 +53,18 @@ public class AdminService {
         return passengerDTOS;
     }
 
-    public List<Driver> getDriverList() {
-        return driverRepository.findAll();
+    public List<DriverDTO> getDriverList() {
+        List<User> driversAsUsers = userRepository.findByRolesIn(Arrays.asList(Role.DRIVER));
+        List<Driver> drivers = driverRepository.findAll();
+        List<DriverDTO> driverDTOS = drivers.stream().map(this::convertToDriverDTO).collect(Collectors.toList());
+        for(DriverDTO dto: driverDTOS) {
+            User pUser = driversAsUsers.stream()
+                    .filter(user -> dto.getPhone().equals(user.getPhone())).findAny().orElse(null);
+            if(pUser != null) {
+                dto.setSuspend(pUser.getSuspend());
+            }
+        }
+        return driverDTOS;
     }
 
     public List<OrgAdmin> getOrgAdminList() {
@@ -62,5 +73,9 @@ public class AdminService {
 
     private PassengerDTO convertToPassengerDTO(Passenger passenger) {
         return modelMapper.map(passenger, PassengerDTO.class);
+    }
+
+    private DriverDTO convertToDriverDTO(Driver driver) {
+        return modelMapper.map(driver, DriverDTO.class);
     }
 }
