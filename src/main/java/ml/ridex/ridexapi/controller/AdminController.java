@@ -11,9 +11,11 @@ import ml.ridex.ridexapi.helper.PasswordGenerator;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Passenger;
+import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.service.AdminService;
 import ml.ridex.ridexapi.service.EmailSender;
+import ml.ridex.ridexapi.service.PassengerService;
 import ml.ridex.ridexapi.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.Month;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +45,9 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private PassengerService passengerService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -160,6 +166,20 @@ public class AdminController {
     @Operation(summary = "Get all passengers")
     public List<PassengerDTO> getPassengerList() {
         return adminService.getPassengerList();
+    }
+
+    @PostMapping("/passenger/pastRides")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get all past rides by passenger")
+    public List<Ride> getPastRides(@Valid @RequestBody AdminPassengerRidesDTO data) {
+        return passengerService.getPastRides(data.getPhone());
+    }
+
+    @PostMapping("/passenger/pastRidesStats")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get passenger past rides by monthly basis")
+    public Map<Month, AdminPassengerRideStatsDTO> getPastRidesStats(@Valid @RequestBody AdminPassengerRidesDTO data) {
+        return passengerService.getPastRidesStats(data.getPhone());
     }
 
     @GetMapping("/driver/all")

@@ -1,12 +1,7 @@
 package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.Role;
-import ml.ridex.ridexapi.exception.EntityNotFoundException;
-import ml.ridex.ridexapi.exception.InvalidOperationException;
-import ml.ridex.ridexapi.model.dao.Driver;
-import ml.ridex.ridexapi.model.dao.OrgAdmin;
-import ml.ridex.ridexapi.model.dao.Passenger;
-import ml.ridex.ridexapi.model.dao.User;
+import ml.ridex.ridexapi.model.dao.*;
 import ml.ridex.ridexapi.model.dto.DriverDTO;
 import ml.ridex.ridexapi.model.dto.PassengerDTO;
 import ml.ridex.ridexapi.repository.*;
@@ -16,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
