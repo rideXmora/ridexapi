@@ -159,7 +159,7 @@ public class AdminController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all passengers")
     public List<PassengerDTO> getPassengerList() {
-        return adminService.getPassengerList().stream().map(this::convertToPassengerDTO).collect(Collectors.toList());
+        return adminService.getPassengerList();
     }
 
     @GetMapping("/driver/all")
