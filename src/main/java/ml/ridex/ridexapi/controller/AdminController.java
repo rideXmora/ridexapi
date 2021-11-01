@@ -159,14 +159,14 @@ public class AdminController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all passengers")
     public List<PassengerDTO> getPassengerList() {
-        return adminService.getPassengerList().stream().map(this::convertToPassengerDTO).collect(Collectors.toList());
+        return adminService.getPassengerList();
     }
 
     @GetMapping("/driver/all")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all drivers")
     public List<DriverDTO> getDriverList() {
-        return adminService.getDriverList().stream().map(this::convertToDriverDTO).collect(Collectors.toList());
+        return adminService.getDriverList();
     }
 
     @GetMapping("/orgAdmin/all")
@@ -176,11 +176,4 @@ public class AdminController {
         return adminService.getOrgAdminList();
     }
 
-    private DriverDTO convertToDriverDTO(Driver driver) {
-        return modelMapper.map(driver, DriverDTO.class);
-    }
-
-    private PassengerDTO convertToPassengerDTO(Passenger passenger) {
-        return modelMapper.map(passenger, PassengerDTO.class);
-    }
 }
