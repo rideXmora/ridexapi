@@ -155,27 +155,6 @@ public class PassengerController {
         return passengerService.getPastRides(principal.getName()).stream().map(this::convertToCommonRideDTO).collect(Collectors.toList());
     }
 
-    @GetMapping("/test")
-    public WSMessageDTO test() throws ExecutionException, InterruptedException {
-        WSMessageDTO data = new WSMessageDTO();
-        data.setMessage("Hello drivers");
-        WebSocketClient client = new StandardWebSocketClient();
-
-        WebSocketStompClient stompClient = new WebSocketStompClient(client);
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-
-        StompSessionHandler sessionHandler = new CustomStompSessionHandler();
-        stompClient.connect("ws://localhost:8080/ws", sessionHandler);
-        new Scanner(System.in).nextLine(); // Don't close immediately.
-
-//        StompSessionHandler sessionHandler = new CustomStompSessionHandler();
-//
-//        StompSession stompSession = stompClient.connect("ws://localhost:8080/ws",
-//                sessionHandler).get();
-//        stompSession.send("ride/request", data);
-        return data;
-    }
-
     private CommonRideDTO convertToCommonRideDTO(Ride ride) {
         return modelMapper.map(ride, CommonRideDTO.class);
     }
