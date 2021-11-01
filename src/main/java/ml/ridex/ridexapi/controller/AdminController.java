@@ -28,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.Month;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,6 +173,13 @@ public class AdminController {
     @Operation(summary = "Get all past rides by passenger")
     public List<Ride> getPastRides(@Valid @RequestBody AdminPassengerRidesDTO data) {
         return passengerService.getPastRides(data.getPhone());
+    }
+
+    @PostMapping("/passenger/pastRidesStats")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get passenger past rides by monthly basis")
+    public Map<Month, AdminPassengerRideStatsDTO> getPastRidesStats(@Valid @RequestBody AdminPassengerRidesDTO data) {
+        return passengerService.getPastRidesStats(data.getPhone());
     }
 
     @GetMapping("/driver/all")
