@@ -25,4 +25,6 @@ public class PassengerDTO {
     private Integer totalRides;
 
     private Boolean enabled;
+
+    private Boolean suspend;
 }
