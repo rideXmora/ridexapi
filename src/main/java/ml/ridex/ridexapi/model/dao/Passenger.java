@@ -23,6 +23,8 @@ public class Passenger {
 
     private Integer totalRides;
 
+    private String notificationToken;
+
     private Boolean enabled;
 
     public Passenger(String phone,
@@ -30,12 +32,14 @@ public class Passenger {
                      String name,
                      Integer totalRating,
                      Integer totalRides,
+                     String notificationToken,
                      Boolean enabled) {
         this.phone = phone;
         this.email = email;
         this.name = name;
         this.totalRating = totalRating;
         this.totalRides = totalRides;
+        this.notificationToken = notificationToken;
         this.enabled = enabled;
     }
 }
