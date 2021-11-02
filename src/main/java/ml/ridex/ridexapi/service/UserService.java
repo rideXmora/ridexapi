@@ -168,6 +168,7 @@ public class UserService implements UserDetailsService {
                     null,
                     0,
                     0,
+                    "token",
                     false
             ));
         }

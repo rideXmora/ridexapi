@@ -42,7 +42,7 @@ class PassengerServiceTest {
     @BeforeEach
     void setUp() {
         passengerService = new PassengerService();
-        passenger = new Passenger("94714461798", null, null, 0, 0,true);
+        passenger = new Passenger("94714461798", null, null, 0, 0,"token",true);
         phone = "+94714461798";
 
         ReflectionTestUtils.setField(passengerService, "passengerRepository", passengerRepository);
@@ -55,14 +55,14 @@ class PassengerServiceTest {
         when(passengerRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(passenger));
         when(passengerRepository.save(any(Passenger.class))).thenReturn(passenger);
 
-        assertThat(passengerService.profileComplete(phone, "ksr@gmail.com", "ksr")).isNotNull();
+        assertThat(passengerService.profileComplete(phone, "ksr@gmail.com", "ksr", "token")).isNotNull();
     }
 
     @Test
     @DisplayName("Profile complete fail")
     void profileCompleteUserNotFound() {
         when(passengerRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(null));
-        assertThatThrownBy(()-> passengerService.profileComplete(phone, "ksr@gmail.com", "ksr"))
+        assertThatThrownBy(()-> passengerService.profileComplete(phone, "ksr@gmail.com", "ksr", "token"))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
