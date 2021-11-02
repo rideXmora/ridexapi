@@ -24,6 +24,8 @@ public class PassengerDTO {
 
     private Integer totalRides;
 
+    private String notificationToken;
+
     private Boolean enabled;
 
     private Boolean suspend;
