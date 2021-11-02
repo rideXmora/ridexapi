@@ -49,10 +49,11 @@ public class PassengerService {
         return passengerRepository.save(passenger);
     }
 
-    public Passenger profileComplete(String phone, String email, String name) throws EntityNotFoundException, InvalidOperationException {
+    public Passenger profileComplete(String phone, String email, String name, String notificationToken) throws EntityNotFoundException, InvalidOperationException {
         Passenger passenger = this.getPassenger(phone);
         passenger.setEmail(email);
         passenger.setName(name);
+        passenger.setNotificationToken(notificationToken);
         passenger.setEnabled(true);
         return passengerRepository.save(passenger);
     }
