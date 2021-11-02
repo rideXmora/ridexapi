@@ -38,6 +38,8 @@ public class Driver {
 
     private DriverOrganization driverOrganization;
 
+    private String notificationToken;
+
     private DriverStatus driverStatus;
 
     private Boolean enabled;
@@ -54,6 +56,7 @@ public class Driver {
             Integer totalRides,
             Vehicle vehicle,
             DriverOrganization driverOrganization,
+            String notificationToken,
             DriverStatus driverStatus,
             Boolean enabled) {
         this.phone = phone;
@@ -67,6 +70,7 @@ public class Driver {
         this.totalRides = totalRides;
         this.vehicle = vehicle;
         this.driverOrganization = driverOrganization;
+        this.notificationToken = notificationToken;
         this.driverStatus = driverStatus;
         this.enabled = enabled;
     }

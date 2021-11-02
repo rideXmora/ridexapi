@@ -54,7 +54,7 @@ public class PassengerController {
     })
     public PassengerDTO profileComplete(@Valid @RequestBody PassengerProfileCompleteDTO data, Principal principal) {
         try {
-            Passenger passenger = passengerService.profileComplete(principal.getName(), data.getEmail(), data.getName());
+            Passenger passenger = passengerService.profileComplete(principal.getName(), data.getEmail(), data.getName(), data.getNotificationToken());
             return modelMapper.map(passenger, PassengerDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

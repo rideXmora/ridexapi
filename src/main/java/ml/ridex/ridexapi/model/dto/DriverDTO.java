@@ -33,6 +33,8 @@ public class DriverDTO {
 
     private DriverOrganization driverOrganization;
 
+    private String notificationToken;
+
     private DriverStatus status;
 
     private Boolean enabled;

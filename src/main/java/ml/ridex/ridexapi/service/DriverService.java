@@ -67,12 +67,15 @@ public class DriverService {
             String name,
             String email,
             String city,
-            DriverOrganization driverOrganization) throws EntityNotFoundException {
+            DriverOrganization driverOrganization,
+            String notificationToken
+    ) throws EntityNotFoundException {
         Driver driver = getDriver(phone);
         driver.setEmail(email);
         driver.setName(name);
         driver.setCity(city);
         driver.setDriverOrganization(driverOrganization);
+        driver.setNotificationToken(notificationToken);
         return driverRepository.save(driver);
     }
 

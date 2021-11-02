@@ -168,6 +168,7 @@ public class UserService implements UserDetailsService {
                     null,
                     0,
                     0,
+                    "token",
                     false
             ));
         }
@@ -212,6 +213,7 @@ public class UserService implements UserDetailsService {
                     0,
                     null,
                     null,
+                    "token",
                     DriverStatus.OFFLINE,
                     false));
         }

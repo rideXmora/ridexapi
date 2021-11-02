@@ -13,4 +13,7 @@ public class PassengerProfileCompleteDTO {
 
     @NotBlank
     private String name;
+
+    @NotBlank
+    private String notificationToken;
 }
