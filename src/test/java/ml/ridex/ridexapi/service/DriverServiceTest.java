@@ -52,7 +52,7 @@ class DriverServiceTest {
     @BeforeEach
     void setup() {
         driverService = new DriverService();
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null, DriverStatus.OFFLINE,false);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null,"" ,DriverStatus.OFFLINE,false);
         phone = "+94714461798";
         driverOrganization = new DriverOrganization();
         driverOrganization.setName("Uber");
@@ -84,7 +84,7 @@ class DriverServiceTest {
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(driverRepository.save(any(Driver.class))).thenReturn(driver);
 
-        assertThat(driverService.profileComplete(phone, "ksr", null,null,null)).isNotNull();
+        assertThat(driverService.profileComplete(phone, "ksr", null,null,null, "")).isNotNull();
     }
 
     @Test

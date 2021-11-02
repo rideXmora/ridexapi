@@ -48,7 +48,7 @@ public class DriverController {
     })
     public DriverDTO profileComplete(@Valid @RequestBody DriverProfileCompleteDTO data, Principal principal) {
         try {
-            Driver driver = driverService.profileComplete(principal.getName(), data.getName(), data.getEmail(), data.getCity(), data.getDriverOrganization());
+            Driver driver = driverService.profileComplete(principal.getName(), data.getName(), data.getEmail(), data.getCity(), data.getDriverOrganization(), data.getNotificationToken());
             return modelMapper.map(driver, DriverDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

@@ -22,4 +22,7 @@ public class DriverProfileCompleteDTO {
 
     @NotNull
     private DriverOrganization driverOrganization;
+
+    @NotBlank
+    private String notificationToken;
 }
