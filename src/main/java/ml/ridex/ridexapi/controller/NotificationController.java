@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/notification")
 public class NotificationController {
@@ -17,22 +19,22 @@ public class NotificationController {
     private NotificationService notificationService;
 
     @PostMapping("/subscribe")
-    public void subscribeToTopic(@RequestBody SubscriptionRequestDTO subscriptionRequestDto) {
+    public void subscribeToTopic(@Valid @RequestBody SubscriptionRequestDTO subscriptionRequestDto) {
         notificationService.subscribeToTopic(subscriptionRequestDto);
     }
 
     @PostMapping("/unsubscribe")
-    public void unsubscribeFromTopic(SubscriptionRequestDTO subscriptionRequestDto) {
+    public void unsubscribeFromTopic(@Valid @RequestBody SubscriptionRequestDTO subscriptionRequestDto) {
         notificationService.unsubscribeFromTopic(subscriptionRequestDto);
     }
 
     @PostMapping("/token")
-    public String sendPnsToDevice(@RequestBody NotificationRequestDTO notificationRequestDto) {
+    public String sendPnsToDevice(@Valid @RequestBody NotificationRequestDTO notificationRequestDto) {
         return notificationService.sendPnsToDevice(notificationRequestDto);
     }
 
     @PostMapping("/topic")
-    public String sendPnsToTopic(@RequestBody NotificationRequestDTO notificationRequestDto) {
+    public String sendPnsToTopic(@Valid @RequestBody NotificationRequestDTO notificationRequestDto) {
         return notificationService.sendPnsToTopic(notificationRequestDto);
     }
 }
