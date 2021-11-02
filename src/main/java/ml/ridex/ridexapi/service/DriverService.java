@@ -75,6 +75,7 @@ public class DriverService {
         driver.setName(name);
         driver.setCity(city);
         driver.setDriverOrganization(driverOrganization);
+        driver.setNotificationToken(notificationToken);
         return driverRepository.save(driver);
     }
 
