@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Deprecated
 @RestController
 @RequestMapping("/api/notification")
 public class NotificationController {
@@ -35,6 +36,6 @@ public class NotificationController {
 
     @PostMapping("/topic")
     public String sendPnsToTopic(@Valid @RequestBody NotificationRequestDTO notificationRequestDto) {
-        return notificationService.sendPnsToTopic(notificationRequestDto);
+        return notificationService.sendPnsToTopic(notificationRequestDto, null);
     }
 }
