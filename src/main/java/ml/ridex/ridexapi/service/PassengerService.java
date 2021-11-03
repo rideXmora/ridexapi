@@ -12,7 +12,9 @@ import ml.ridex.ridexapi.model.daoHelper.Location;
 import ml.ridex.ridexapi.model.daoHelper.RideRequestPassenger;
 import ml.ridex.ridexapi.model.dto.AdminPassengerRideStatsDTO;
 import ml.ridex.ridexapi.model.dto.AdminPassengerRidesDTO;
+import ml.ridex.ridexapi.model.redis.DriverState;
 import ml.ridex.ridexapi.repository.PassengerRepository;
+import ml.ridex.ridexapi.repository.RedisDriverStateRepository;
 import ml.ridex.ridexapi.repository.RideRepository;
 import ml.ridex.ridexapi.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,13 @@ public class PassengerService {
     private RideRepository rideRepository;
 
     @Autowired
+    private RedisDriverStateRepository redisDriverStateRepository;
+
+    @Autowired
     private DriverService driverService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public Passenger getPassenger(String phone) {
         Optional<Passenger> passengerOptional = passengerRepository.findByPhone(phone);
@@ -87,6 +95,15 @@ public class PassengerService {
                 Instant.now().getEpochSecond()
         );
         return rideRequestRepository.save(rideRequest);
+    }
+
+    public void notifyDrivers(RideRequest rideRequest) {
+        List<DriverState> drivers = (List<DriverState>) redisDriverStateRepository.findAll();
+        List<String> tokens = new ArrayList<>();
+        for(DriverState driverState: drivers) {
+            tokens.add(driverState.getNotificationToken());
+        }
+        notificationService.notifyDrivers(rideRequest, tokens);
     }
 
     public Ride getRide(String phone, String id) {
