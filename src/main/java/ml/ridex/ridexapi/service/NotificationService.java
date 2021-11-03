@@ -23,17 +23,17 @@ public class NotificationService {
     @Autowired
     private FCMService fcmService;
 
-    public void subscribeToRideTopic(String token) {
+    public void subscribeToRideTopic(String token) throws InvalidOperationException {
         SubscriptionRequestDTO dto = new SubscriptionRequestDTO(TOPIC, Arrays.asList(token));
         fcmService.subscribeToTopic(dto);
     }
 
-    public void unsubscribeFromRideTopic(String token) {
+    public void unsubscribeFromRideTopic(String token) throws InvalidOperationException {
         SubscriptionRequestDTO dto = new SubscriptionRequestDTO(TOPIC, Arrays.asList(token));
         fcmService.unsubscribeFromTopic(dto);
     }
 
-    public void notifyDrivers(RideRequest rideRequest, List<String> driverTokens) {
+    public void notifyDrivers(RideRequest rideRequest, List<String> driverTokens) throws InvalidOperationException {
         Map<String, String> rideSummary = new HashMap<>();
         rideSummary.put("id", rideRequest.getId());
         rideSummary.put("passengerName", rideRequest.getPassenger().getName());
@@ -46,7 +46,7 @@ public class NotificationService {
         fcmService.sendPnsToTopic(dto, rideSummary);
     }
 
-    public void notifyPassenger(String token, RideStatus status, String message) {
+    public void notifyPassenger(String token, RideStatus status, String message) throws InvalidOperationException {
         NotificationRequestDTO dto;
         switch (status) {
             case ACCEPTED:
