@@ -52,7 +52,7 @@ class DriverServiceTest {
     @BeforeEach
     void setup() {
         driverService = new DriverService();
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null,"" ,DriverStatus.OFFLINE,false);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null,"token" ,DriverStatus.OFFLINE,false);
         phone = "+94714461798";
         driverOrganization = new DriverOrganization();
         driverOrganization.setName("Uber");
@@ -147,7 +147,7 @@ class DriverServiceTest {
     @DisplayName("Toggle driver Status to ONLINE")
     void toggleStatus() {
         Location location = new Location(2.111,54.0);
-        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond(), "token");
         driver.setDriverStatus(DriverStatus.OFFLINE);
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(driverRepository.save(any(Driver.class))).thenReturn(driver);
@@ -160,7 +160,7 @@ class DriverServiceTest {
     @DisplayName("Updating driver location when available in redis")
     void updateLocation() {
         Location location = new Location(2.111,54.0);
-        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond(), "token");
 
         when(redisDriverStateRepository.findById(phone)).thenReturn(Optional.ofNullable(driverState));
         when(redisDriverStateRepository.save(driverState)).thenReturn(driverState);
@@ -173,7 +173,7 @@ class DriverServiceTest {
     void updateLocationNewObject() {
         driver.setDriverStatus(DriverStatus.ONLINE);
         Location location = new Location(2.111,54.0);
-        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond(), "token");
 
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(redisDriverStateRepository.findById(phone)).thenReturn(Optional.ofNullable(null));
