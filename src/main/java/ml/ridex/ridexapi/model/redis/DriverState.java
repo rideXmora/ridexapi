@@ -14,10 +14,12 @@ public class DriverState {
     private String phone;
     private Location location;
     private long lastSeen;
+    private String notificationToken;
 
-    public DriverState(String phone, Location location, long lastSeen) {
+    public DriverState(String phone, Location location, long lastSeen, String notificationToken) {
         this.phone = phone;
         this.location = location;
         this.lastSeen = lastSeen;
+        this.notificationToken = notificationToken;
     }
 }
