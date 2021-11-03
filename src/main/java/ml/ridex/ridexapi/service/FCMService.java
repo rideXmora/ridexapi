@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.Map;
 
 @Service
 public class FCMService {
@@ -77,12 +78,11 @@ public class FCMService {
         return response;
     }
 
-    public String sendPnsToTopic(NotificationRequestDTO notificationRequestDto) {
+    public String sendPnsToTopic(NotificationRequestDTO notificationRequestDto, Map<String, String> rideSummary) {
         Message message = Message.builder()
                 .setTopic(notificationRequestDto.getTarget())
                 .setNotification(new Notification(notificationRequestDto.getTitle(), notificationRequestDto.getBody()))
-                .putData("content", notificationRequestDto.getTitle())
-                .putData("body", notificationRequestDto.getBody())
+                .putAllData(rideSummary)
                 .build();
 
         String response = null;
