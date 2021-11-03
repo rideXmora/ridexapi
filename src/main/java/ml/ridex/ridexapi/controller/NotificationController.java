@@ -2,7 +2,7 @@ package ml.ridex.ridexapi.controller;
 
 import ml.ridex.ridexapi.model.dto.NotificationRequestDTO;
 import ml.ridex.ridexapi.model.dto.SubscriptionRequestDTO;
-import ml.ridex.ridexapi.service.NotificationService;
+import ml.ridex.ridexapi.service.FCMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +16,7 @@ import javax.validation.Valid;
 public class NotificationController {
 
     @Autowired
-    private NotificationService notificationService;
+    private FCMService notificationService;
 
     @PostMapping("/subscribe")
     public void subscribeToTopic(@Valid @RequestBody SubscriptionRequestDTO subscriptionRequestDto) {

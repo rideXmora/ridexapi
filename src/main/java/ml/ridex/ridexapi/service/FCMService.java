@@ -18,7 +18,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 @Service
-public class NotificationService {
+public class FCMService {
 
     @Value("${app.firebase-config}")
     private String firebaseConfig;
