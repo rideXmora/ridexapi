@@ -60,12 +60,11 @@ public class FCMService {
         }
     }
 
-    public String sendPnsToDevice(NotificationRequestDTO notificationRequestDto) {
+    public String sendPnsToDevice(NotificationRequestDTO notificationRequestDto, Map<String, String> rideDetails) {
         Message message = Message.builder()
                 .setToken(notificationRequestDto.getTarget())
                 .setNotification(new Notification(notificationRequestDto.getTitle(), notificationRequestDto.getBody()))
-                .putData("content", notificationRequestDto.getTitle())
-                .putData("body", notificationRequestDto.getBody())
+                .putAllData(rideDetails)
                 .build();
 
         String response = null;
