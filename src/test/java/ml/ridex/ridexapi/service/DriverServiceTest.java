@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +46,8 @@ class DriverServiceTest {
     OrgAdminRepository orgAdminRepository;
     @Mock
     RedisDriverStateRepository redisDriverStateRepository;
+    @Mock
+    NotificationService notificationService;
 
     Driver driver;
     String phone;
@@ -62,6 +65,7 @@ class DriverServiceTest {
         ReflectionTestUtils.setField(driverService, "rideRequestRepository", rideRequestRepository);
         ReflectionTestUtils.setField(driverService, "redisDriverStateRepository", redisDriverStateRepository);
         ReflectionTestUtils.setField(driverService, "orgAdminRepository", orgAdminRepository);
+        ReflectionTestUtils.setField(driverService, "notificationService", notificationService);
     }
 
     @Test
@@ -152,6 +156,7 @@ class DriverServiceTest {
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(driverRepository.save(any(Driver.class))).thenReturn(driver);
         when(redisDriverStateRepository.save(any(DriverState.class))).thenReturn(driverState);
+        doNothing().when(notificationService).subscribeToRideTopic(anyString());
 
         assertThat(driverService.toggleStatus(phone, location).getDriverStatus()).isEqualTo(DriverStatus.ONLINE);
     }
