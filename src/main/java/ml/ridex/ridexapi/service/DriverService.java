@@ -44,6 +44,9 @@ public class DriverService {
     @Autowired
     private PassengerService passengerService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public Driver getDriver(String phone) {
         Optional<Driver> driverOptional = driverRepository.findByPhone(phone);
         if(driverOptional.isEmpty())
@@ -150,11 +153,13 @@ public class DriverService {
         Driver driver = getDriver(phone);
         if(driver.getDriverStatus() == DriverStatus.ONLINE) {
             driver.setDriverStatus(DriverStatus.OFFLINE);
+            notificationService.unsubscribeFromRideTopic(driver.getNotificationToken());
             redisDriverStateRepository.deleteById(phone);
         }
         else {
             driver.setDriverStatus(DriverStatus.ONLINE);
             state = new DriverState(phone, location, Instant.now().getEpochSecond(), driver.getNotificationToken());
+            notificationService.subscribeToRideTopic(driver.getNotificationToken());
             redisDriverStateRepository.save(state);
         }
         return driverRepository.save(driver);
