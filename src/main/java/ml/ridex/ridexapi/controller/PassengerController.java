@@ -110,6 +110,7 @@ public class PassengerController {
                     data.getStartLocation(),
                     data.getEndLocation(),
                     data.getDistance());
+            passengerService.notifyDrivers(rideRequest);
             return modelMapper.map(rideRequest, RideRequestResDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
