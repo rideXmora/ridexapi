@@ -154,7 +154,7 @@ public class DriverService {
         }
         else {
             driver.setDriverStatus(DriverStatus.ONLINE);
-            state = new DriverState(phone, location, Instant.now().getEpochSecond());
+            state = new DriverState(phone, location, Instant.now().getEpochSecond(), driver.getNotificationToken());
             redisDriverStateRepository.save(state);
         }
         return driverRepository.save(driver);
@@ -167,7 +167,7 @@ public class DriverService {
             Driver driver = getDriver(phone);
             if(driver.getDriverStatus() != DriverStatus.ONLINE)
                 throw new InvalidOperationException("Driver is not ONLINE");
-            driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+            driverState = new DriverState(phone, location, Instant.now().getEpochSecond(), driver.getNotificationToken());
         }
         else
             driverState = driverStateOptional.get();
