@@ -46,21 +46,11 @@ public class NotificationService {
         fcmService.sendPnsToTopic(dto, rideSummary);
     }
 
-    public void notifyPassenger(String token, RideStatus status, String message) throws InvalidOperationException {
-        NotificationRequestDTO dto;
-        switch (status) {
-            case ACCEPTED:
-                dto = new NotificationRequestDTO(token,"Accepted" ,message);
-                break;
-            case ARRIVED:
-                dto = new NotificationRequestDTO(token,"Arrived" ,message);
-                break;
-            case DROPPED:
-                dto = new NotificationRequestDTO(token,"Complete the payment" ,message);
-                break;
-            default:
-                throw new InvalidOperationException("Invalid notification request");
-        }
-        fcmService.sendPnsToDevice(dto);
+    public void notifyPassenger(String token, String rideId, RideStatus status, String message) throws InvalidOperationException {
+        NotificationRequestDTO dto = new NotificationRequestDTO(token, status.toString(), message);
+
+        Map<String, String> rideDetails = new  HashMap<>();
+        rideDetails.put("rideId", rideId);
+        fcmService.sendPnsToDevice(dto, rideDetails);
     }
 }
