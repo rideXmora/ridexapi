@@ -31,7 +31,7 @@ public class NotificationController {
 
     @PostMapping("/token")
     public String sendPnsToDevice(@Valid @RequestBody NotificationRequestDTO notificationRequestDto) {
-        return notificationService.sendPnsToDevice(notificationRequestDto);
+        return notificationService.sendPnsToDevice(notificationRequestDto, null);
     }
 
     @PostMapping("/topic")
