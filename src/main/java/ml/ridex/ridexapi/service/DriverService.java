@@ -159,6 +159,9 @@ public class DriverService {
             case ARRIVED:
                 message = "Driver is arrived. " + ride.getRideRequest().getDriver().getVehicle().getNumber();
                 break;
+            case PICKED:
+                message = "Start the ride";
+                break;
             case DROPPED:
                 message = "Pay Rs: " + ride.getPayment().toString();
                 break;
