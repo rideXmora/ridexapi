@@ -218,13 +218,14 @@ public class DriverController {
     })
     public CommonRideDTO rideFinished(@Valid @RequestBody DriverRideFinishDTO data, Principal principal) {
         try {
-            return modelMapper.map(driverService.finishRide(principal.getName(),
+            Ride ride = driverService.finishRide(principal.getName(),
                     data.getId(),
                     RideStatus.FINISHED,
                     data.getPassengerRating(),
                     data.getDriverFeedback(),
-                    data.getWaitingTime())
-            , CommonRideDTO.class);
+                    data.getWaitingTime());
+            driverService.notifyPassenger(ride);
+            return modelMapper.map(ride, CommonRideDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
