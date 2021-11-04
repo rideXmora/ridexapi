@@ -50,7 +50,7 @@ public class NotificationService {
         NotificationRequestDTO dto = new NotificationRequestDTO(token, status.toString(), message);
 
         Map<String, String> rideDetails = new  HashMap<>();
-        rideDetails.put("rideId", rideId);
+        rideDetails.put("id", rideId);
         fcmService.sendPnsToDevice(dto, rideDetails);
     }
 }
