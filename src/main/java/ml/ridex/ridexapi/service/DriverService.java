@@ -167,6 +167,9 @@ public class DriverService {
             case DROPPED:
                 message = "Pay Rs: " + ride.getPayment().toString();
                 break;
+            case FINISHED:
+                message = "Completed the ride";
+                break;
             default:
                 throw new InvalidOperationException("Invalid notification request");
         }
