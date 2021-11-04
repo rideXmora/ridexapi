@@ -1,97 +1,56 @@
 package ml.ridex.ridexapi.service;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
+import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
+import ml.ridex.ridexapi.model.dao.RideRequest;
 import ml.ridex.ridexapi.model.dto.NotificationRequestDTO;
 import ml.ridex.ridexapi.model.dto.SubscriptionRequestDTO;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class NotificationService {
 
-    @Value("${app.firebase-config}")
-    private String firebaseConfig;
+    private static final String TOPIC = "rides";
+    private static final String TITLE = "New ride request";
+    private static final String BODY = "Tap to view the request";
 
-    private FirebaseApp firebaseApp;
+    @Autowired
+    private FCMService fcmService;
 
-    @PostConstruct
-    private void initialize() {
-        try {
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(new ClassPathResource(firebaseConfig).getInputStream())).build();
-
-            if(FirebaseApp.getApps().isEmpty()) {
-                this.firebaseApp = FirebaseApp.initializeApp(options);
-            } else {
-                this.firebaseApp = FirebaseApp.getInstance();
-            }
-        } catch (IOException e) {
-            throw new InvalidOperationException(e.getMessage());
-        }
+    public void subscribeToRideTopic(String token) throws InvalidOperationException {
+        SubscriptionRequestDTO dto = new SubscriptionRequestDTO(TOPIC, Arrays.asList(token));
+        fcmService.subscribeToTopic(dto);
     }
 
-    public void subscribeToTopic(SubscriptionRequestDTO subscriptionRequestDto) {
-        try {
-            FirebaseMessaging.getInstance(firebaseApp).subscribeToTopic(subscriptionRequestDto.getTokens(),
-                    subscriptionRequestDto.getTopicName());
-        } catch (FirebaseMessagingException e) {
-            throw new InvalidOperationException(e.getMessage());
-        }
+    public void unsubscribeFromRideTopic(String token) throws InvalidOperationException {
+        SubscriptionRequestDTO dto = new SubscriptionRequestDTO(TOPIC, Arrays.asList(token));
+        fcmService.unsubscribeFromTopic(dto);
     }
 
-    public void unsubscribeFromTopic(SubscriptionRequestDTO subscriptionRequestDto) {
-        try {
-            FirebaseMessaging.getInstance(firebaseApp).unsubscribeFromTopic(subscriptionRequestDto.getTokens(),
-                    subscriptionRequestDto.getTopicName());
-        } catch (FirebaseMessagingException e) {
-            throw new InvalidOperationException(e.getMessage());
-        }
+    public void notifyDrivers(RideRequest rideRequest, List<String> driverTokens) throws InvalidOperationException {
+        Map<String, String> rideSummary = new HashMap<>();
+        rideSummary.put("id", rideRequest.getId());
+        rideSummary.put("passengerName", rideRequest.getPassenger().getName());
+        rideSummary.put("passengerPhone", rideRequest.getPassenger().getPhone());
+        rideSummary.put("passengerRating", rideRequest.getPassenger().getRating().toString());
+        rideSummary.put("startLocationX", rideRequest.getStartLocation().getX().toString());
+        rideSummary.put("startLocationY", rideRequest.getStartLocation().getY().toString());
+
+        NotificationRequestDTO dto = new NotificationRequestDTO(TOPIC, TITLE, BODY);
+        fcmService.sendPnsToTopic(dto, rideSummary);
     }
 
-    public String sendPnsToDevice(NotificationRequestDTO notificationRequestDto) {
-        Message message = Message.builder()
-                .setToken(notificationRequestDto.getTarget())
-                .setNotification(new Notification(notificationRequestDto.getTitle(), notificationRequestDto.getBody()))
-                .putData("content", notificationRequestDto.getTitle())
-                .putData("body", notificationRequestDto.getBody())
-                .build();
+    public void notifyPassenger(String token, String rideId, RideStatus status, String message) throws InvalidOperationException {
+        NotificationRequestDTO dto = new NotificationRequestDTO(token, status.toString(), message);
 
-        String response = null;
-        try {
-            response = FirebaseMessaging.getInstance().send(message);
-        } catch (FirebaseMessagingException e) {
-            throw new InvalidOperationException(e.getMessage());
-        }
-
-        return response;
-    }
-
-    public String sendPnsToTopic(NotificationRequestDTO notificationRequestDto) {
-        Message message = Message.builder()
-                .setTopic(notificationRequestDto.getTarget())
-                .setNotification(new Notification(notificationRequestDto.getTitle(), notificationRequestDto.getBody()))
-                .putData("content", notificationRequestDto.getTitle())
-                .putData("body", notificationRequestDto.getBody())
-                .build();
-
-        String response = null;
-        try {
-            FirebaseMessaging.getInstance().send(message);
-        } catch (FirebaseMessagingException e) {
-            throw new InvalidOperationException(e.getMessage());
-        }
-
-        return response;
+        Map<String, String> rideDetails = new  HashMap<>();
+        rideDetails.put("rideId", rideId);
+        fcmService.sendPnsToDevice(dto, rideDetails);
     }
 }

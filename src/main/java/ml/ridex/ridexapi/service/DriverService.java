@@ -44,6 +44,9 @@ public class DriverService {
     @Autowired
     private PassengerService passengerService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public Driver getDriver(String phone) {
         Optional<Driver> driverOptional = driverRepository.findByPhone(phone);
         if(driverOptional.isEmpty())
@@ -145,16 +148,41 @@ public class DriverService {
         return rideRepository.save(ride);
     }
 
+    public void notifyPassenger(Ride ride) throws EntityNotFoundException {
+        // Can remove if rideRequest has the notification token
+        Passenger passenger = passengerService.getPassenger(ride.getRideRequest().getPassenger().getPhone());
+        String message;
+        switch (ride.getRideStatus()) {
+            case ACCEPTED:
+                message = ride.getRideRequest().getDriver().getName() + "accept your ride";
+                break;
+            case ARRIVED:
+                message = "Driver is arrived. " + ride.getRideRequest().getDriver().getVehicle().getNumber();
+                break;
+            case PICKED:
+                message = "Start the ride";
+                break;
+            case DROPPED:
+                message = "Pay Rs: " + ride.getPayment().toString();
+                break;
+            default:
+                throw new InvalidOperationException("Invalid notification request");
+        }
+        notificationService.notifyPassenger(passenger.getNotificationToken(), ride.getId(), ride.getRideStatus(), message);
+    }
+
     public Driver toggleStatus(String phone, Location location) throws EntityNotFoundException{
         DriverState state;
         Driver driver = getDriver(phone);
         if(driver.getDriverStatus() == DriverStatus.ONLINE) {
             driver.setDriverStatus(DriverStatus.OFFLINE);
+            notificationService.unsubscribeFromRideTopic(driver.getNotificationToken());
             redisDriverStateRepository.deleteById(phone);
         }
         else {
             driver.setDriverStatus(DriverStatus.ONLINE);
-            state = new DriverState(phone, location, Instant.now().getEpochSecond());
+            state = new DriverState(phone, location, Instant.now().getEpochSecond(), driver.getNotificationToken());
+            notificationService.subscribeToRideTopic(driver.getNotificationToken());
             redisDriverStateRepository.save(state);
         }
         return driverRepository.save(driver);
@@ -167,7 +195,7 @@ public class DriverService {
             Driver driver = getDriver(phone);
             if(driver.getDriverStatus() != DriverStatus.ONLINE)
                 throw new InvalidOperationException("Driver is not ONLINE");
-            driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+            driverState = new DriverState(phone, location, Instant.now().getEpochSecond(), driver.getNotificationToken());
         }
         else
             driverState = driverStateOptional.get();

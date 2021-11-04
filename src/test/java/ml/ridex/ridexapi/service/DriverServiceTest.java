@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +46,8 @@ class DriverServiceTest {
     OrgAdminRepository orgAdminRepository;
     @Mock
     RedisDriverStateRepository redisDriverStateRepository;
+    @Mock
+    NotificationService notificationService;
 
     Driver driver;
     String phone;
@@ -52,7 +55,7 @@ class DriverServiceTest {
     @BeforeEach
     void setup() {
         driverService = new DriverService();
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null,"" ,DriverStatus.OFFLINE,false);
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null,"token" ,DriverStatus.OFFLINE,false);
         phone = "+94714461798";
         driverOrganization = new DriverOrganization();
         driverOrganization.setName("Uber");
@@ -62,6 +65,7 @@ class DriverServiceTest {
         ReflectionTestUtils.setField(driverService, "rideRequestRepository", rideRequestRepository);
         ReflectionTestUtils.setField(driverService, "redisDriverStateRepository", redisDriverStateRepository);
         ReflectionTestUtils.setField(driverService, "orgAdminRepository", orgAdminRepository);
+        ReflectionTestUtils.setField(driverService, "notificationService", notificationService);
     }
 
     @Test
@@ -147,11 +151,12 @@ class DriverServiceTest {
     @DisplayName("Toggle driver Status to ONLINE")
     void toggleStatus() {
         Location location = new Location(2.111,54.0);
-        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond(), "token");
         driver.setDriverStatus(DriverStatus.OFFLINE);
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(driverRepository.save(any(Driver.class))).thenReturn(driver);
         when(redisDriverStateRepository.save(any(DriverState.class))).thenReturn(driverState);
+        doNothing().when(notificationService).subscribeToRideTopic(anyString());
 
         assertThat(driverService.toggleStatus(phone, location).getDriverStatus()).isEqualTo(DriverStatus.ONLINE);
     }
@@ -160,7 +165,7 @@ class DriverServiceTest {
     @DisplayName("Updating driver location when available in redis")
     void updateLocation() {
         Location location = new Location(2.111,54.0);
-        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond(), "token");
 
         when(redisDriverStateRepository.findById(phone)).thenReturn(Optional.ofNullable(driverState));
         when(redisDriverStateRepository.save(driverState)).thenReturn(driverState);
@@ -173,7 +178,7 @@ class DriverServiceTest {
     void updateLocationNewObject() {
         driver.setDriverStatus(DriverStatus.ONLINE);
         Location location = new Location(2.111,54.0);
-        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond());
+        DriverState driverState = new DriverState(phone, location, Instant.now().getEpochSecond(), "token");
 
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(redisDriverStateRepository.findById(phone)).thenReturn(Optional.ofNullable(null));
