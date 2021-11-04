@@ -107,7 +107,7 @@ public class PassengerService {
     }
 
     public RideRequest rideRequestTimeout(String phone, String id) {
-        Optional<RideRequest> rideRequestOptional = rideRequestRepository.findByIdAndPhone(id, phone);
+        Optional<RideRequest> rideRequestOptional = rideRequestRepository.findByIdAndPassengerPhone(id, phone);
         if(rideRequestOptional.isEmpty())
             throw new EntityNotFoundException("Can't find the the ride request");
         RideRequest rideRequest = rideRequestOptional.get();

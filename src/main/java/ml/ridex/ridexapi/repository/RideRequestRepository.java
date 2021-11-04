@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 
 public interface RideRequestRepository extends MongoRepository<RideRequest, String> {
-    public Optional<RideRequest> findByIdAndPhone(String id, String phone);
+    public Optional<RideRequest> findByIdAndPassengerPhone(String id, String phone);
 }
