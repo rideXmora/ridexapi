@@ -108,6 +108,7 @@ public class DriverController {
     public CommonRideDTO acceptRideRequest(@Valid @RequestBody RideRequestAcceptDTO data, Principal principal) {
         try {
             Ride ride = driverService.acceptRideRequest(principal.getName(), data.getId());
+            driverService.notifyPassenger(ride);
             return modelMapper.map(ride, CommonRideDTO.class);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
