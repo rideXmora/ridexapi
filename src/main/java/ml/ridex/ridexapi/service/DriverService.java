@@ -102,6 +102,8 @@ public class DriverService {
         RideRequest rideRequest = rideRequestOptional.get();
         if(rideRequest.getStatus() == RideRequestStatus.ACCEPTED)
             throw new InvalidOperationException("All ready accepted by someone else");
+        if(rideRequest.getStatus() == RideRequestStatus.TIMEOUT)
+            throw new InvalidOperationException("Ride request is timeout");
         // Driver
         Driver driver = getDriver(phone);
         if(!driver.getEnabled())
