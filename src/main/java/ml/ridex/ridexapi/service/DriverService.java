@@ -148,6 +148,26 @@ public class DriverService {
         return rideRepository.save(ride);
     }
 
+    public void notifyPassenger(Ride ride) throws EntityNotFoundException {
+        // Can remove if rideRequest has the notification token
+        Passenger passenger = passengerService.getPassenger(ride.getRideRequest().getPassenger().getPhone());
+        String message;
+        switch (ride.getRideStatus()) {
+            case ACCEPTED:
+                message = ride.getRideRequest().getDriver().getName() + "accept your ride";
+                break;
+            case ARRIVED:
+                message = "Driver is arrived. " + ride.getRideRequest().getDriver().getVehicle().getNumber();
+                break;
+            case DROPPED:
+                message = "Pay Rs: " + ride.getPayment().toString();
+                break;
+            default:
+                throw new InvalidOperationException("Invalid notification request");
+        }
+        notificationService.notifyPassenger(passenger.getNotificationToken(), ride.getId(), ride.getRideStatus(), message);
+    }
+
     public Driver toggleStatus(String phone, Location location) throws EntityNotFoundException{
         DriverState state;
         Driver driver = getDriver(phone);
