@@ -119,6 +119,22 @@ public class PassengerController {
         }
     }
 
+    @PostMapping("/ride/request/timeout")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Timeout ride request")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Request timeout"),
+            @ApiResponse(responseCode = "400", description = "Invalid rideRequest"),
+    })
+    public RideRequestResDTO timeoutRideRequest(@Valid @RequestBody PassengerRideRequestTimeoutDTO data, Principal principal) {
+        try {
+            return modelMapper.map(passengerService.rideRequestTimeout(principal.getName(), data.getId()),
+                    RideRequestResDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
     @PostMapping("/ride/getRide")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get ride")

@@ -106,6 +106,15 @@ public class PassengerService {
         notificationService.notifyDrivers(rideRequest, tokens);
     }
 
+    public RideRequest rideRequestTimeout(String phone, String id) {
+        Optional<RideRequest> rideRequestOptional = rideRequestRepository.findByIdAndPhone(id, phone);
+        if(rideRequestOptional.isEmpty())
+            throw new EntityNotFoundException("Can't find the the ride request");
+        RideRequest rideRequest = rideRequestOptional.get();
+        rideRequest.setStatus(RideRequestStatus.TIMEOUT);
+        return rideRequestRepository.save(rideRequest);
+    }
+
     public Ride getRide(String phone, String id) {
         Optional<Ride> ride = rideRepository.findByIdAndRideRequestPassengerPhone(id, phone);
         if(ride.isEmpty())
