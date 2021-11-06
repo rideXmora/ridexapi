@@ -24,4 +24,6 @@ public class OrgAdminLoginResDTO {
     private String token;
 
     private List<Payment> payments;
+
+    private Double totalIncome;
 }
