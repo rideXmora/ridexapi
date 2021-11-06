@@ -11,11 +11,7 @@ import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.daoHelper.Payment;
-import ml.ridex.ridexapi.model.dto.DriverDTO;
-import ml.ridex.ridexapi.model.dto.OrgAdminEnableDriver;
-import ml.ridex.ridexapi.model.dto.SuspendUserDTO;
-import ml.ridex.ridexapi.model.dto.UserDTO;
-import ml.ridex.ridexapi.model.dto.OrgAdminPaymentDTO;
+import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.service.OrgAdminService;
 import ml.ridex.ridexapi.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -136,6 +132,26 @@ public class OrgAdminController {
             return orgAdminService.getPastRides(orgAdmin.getId());
         } catch(EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/ride/past/driver")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get past rides for a driver between to epoch seconds timestamps")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "get past rides"),
+            @ApiResponse(responseCode = "401", description = "No auth")
+    })
+    public List<Ride> pastRidesForDriverBetweenTImeInterval(@Valid @RequestBody OrgAdminPastRidesDTO data, Principal principal) {
+        try {
+            OrgAdmin orgAdmin = orgAdminService.getOrgAdmin(principal.getName());
+            return orgAdminService.getPastRidesBetweenTimePeriod(
+                    orgAdmin.getId(),
+                    data.getPhone(),
+                    data.getStartEpoch(),
+                    data.getEndEpoch());
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 
