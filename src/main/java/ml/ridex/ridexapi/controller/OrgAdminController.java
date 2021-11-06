@@ -41,6 +41,17 @@ public class OrgAdminController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/profile")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get profile details")
+    public OrgAdminDTO getPassenger(Principal principal) {
+        try {
+            return modelMapper.map(orgAdminService.getOrgAdmin(principal.getName()),OrgAdminDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
     @GetMapping("/drivers/registered")
     @Operation(summary = "Get registered drivers")
     @ApiResponses(value = {
