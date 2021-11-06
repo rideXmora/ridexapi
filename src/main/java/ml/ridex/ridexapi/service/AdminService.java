@@ -65,6 +65,15 @@ public class AdminService {
         return orgAdminRepository.findAll();
     }
 
+    public Double totalIncome() {
+        List<OrgAdmin> orgAdminList = orgAdminRepository.findAll();
+        Double totalIncome = 0.0;
+        for (OrgAdmin orgAdmin: orgAdminList) {
+            totalIncome += orgAdmin.getTotalIncome();
+        }
+        return totalIncome;
+    }
+
     private PassengerDTO convertToPassengerDTO(Passenger passenger) {
         return modelMapper.map(passenger, PassengerDTO.class);
     }
