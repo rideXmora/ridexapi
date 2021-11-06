@@ -196,4 +196,11 @@ public class AdminController {
         return adminService.getOrgAdminList();
     }
 
+    @GetMapping("/totalIncome")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Total income")
+    public Double getTotalIncome() {
+        return adminService.totalIncome();
+    }
+
 }

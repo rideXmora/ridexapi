@@ -1,5 +1,6 @@
 package ml.ridex.ridexapi.service;
 
+import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
@@ -85,5 +86,9 @@ public class OrgAdminService {
 
     public List<Ride> getPastRides(String id) {
         return rideRepository.findByRideRequestOrganizationId(id);
+    }
+
+    public List<Ride> getPastRidesBetweenTimePeriod(String orgId, String driverPhone, long startEpoch, long endEpoch) {
+        return rideRepository.findByRideRequestBetweenTimeInterval(orgId, driverPhone, RideStatus.CONFIRMED, startEpoch, endEpoch);
     }
 }

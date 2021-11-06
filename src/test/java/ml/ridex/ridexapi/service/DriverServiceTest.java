@@ -113,7 +113,7 @@ class DriverServiceTest {
 
     @Test
     void acceptRideRequest() {
-        OrgAdmin orgAdmin = new OrgAdmin("ksr", phone,"ksr@gmail.com", "sadafd","Col","Address",null,true);
+        OrgAdmin orgAdmin = new OrgAdmin("ksr", phone,"ksr@gmail.com", "sadafd","Col","Address",null,0.0,true);
         Vehicle vehicle = new Vehicle("NW1231", VehicleType.CAR,"Alto","dsfsd","ins", "124");
 
         Payment payment = new Payment();

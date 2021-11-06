@@ -27,6 +27,8 @@ public class OrgAdmin {
 
     private List<Payment> payments;
 
+    private Double totalIncome;
+
     private Boolean enabled;
 
     public OrgAdmin(
@@ -37,6 +39,7 @@ public class OrgAdmin {
             String basedCity,
             String address,
             List<Payment> payments,
+            Double totalIncome,
             Boolean enabled) {
         this.name = name;
         this.phone = phone;
@@ -45,6 +48,7 @@ public class OrgAdmin {
         this.basedCity = basedCity;
         this.address = address;
         this.payments = payments;
+        this.totalIncome = totalIncome;
         this.enabled = enabled;
     }
 }

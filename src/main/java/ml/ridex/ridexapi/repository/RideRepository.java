@@ -23,4 +23,11 @@ public interface RideRepository extends MongoRepository<Ride, String> {
 
     @Query("{ 'rideStatus': ?1, 'rideRequest.driver.phone': ?0 }")
     public List<Ride> findByRideRequestAndRideRequestDriverPhone(String id, RideStatus rideStatus);
+
+    @Query("{ 'rideRequest.organization.id': ?0, 'rideRequest.driver.phone': ?1, 'rideStatus': ?2, 'rideRequest.timestamp' : {'$gt' : ?3, '$lt' : ?4} }")
+    public List<Ride> findByRideRequestBetweenTimeInterval(String id,
+                                                           String phone,
+                                                           RideStatus rideStatus,
+                                                           long startEpoch,
+                                                           long endEpoch);
 }
