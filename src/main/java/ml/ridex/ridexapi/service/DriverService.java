@@ -246,6 +246,15 @@ public class DriverService {
         passenger.setTotalRides(passenger.getTotalRides() + 1);
         passengerService.savePassenger(passenger);
 
+        // Add payment to the orgAdmin
+        OrgAdmin orgAdmin = this.getOrgAdmin(ride.getRideRequest().getOrganization().getId());
+        if(orgAdmin.getTotalIncome() == null) {
+            orgAdmin.setTotalIncome(ride.getPayment());
+        } else {
+            orgAdmin.setTotalIncome(orgAdmin.getTotalIncome() + ride.getPayment());
+        }
+        orgAdminRepository.save(orgAdmin);
+
         return rideRepository.save(ride);
     }
 
