@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -147,7 +148,7 @@ public class PassengerService {
         Map<Month, AdminPassengerRideStatsDTO> stats = new HashMap<>();
 
         for(Ride ride: rides) {
-            LocalDate localDate = LocalDate.ofEpochDay(ride.getRideRequest().getTimestamp());
+            LocalDate localDate = Instant.ofEpochSecond(ride.getRideRequest().getTimestamp()).atZone(ZoneId.systemDefault()).toLocalDate();
             Month month = localDate.getMonth();
             AdminPassengerRideStatsDTO dto = stats.get(month);
             if(dto == null) {
