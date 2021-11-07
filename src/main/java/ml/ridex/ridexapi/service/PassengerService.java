@@ -161,6 +161,26 @@ public class PassengerService {
         return stats;
     }
 
+    public Map<Month,AdminPassengerRideStatsDTO> getAdminRidesStats() {
+        List<Ride> rides = rideRepository.findAll();
+        Map<Month, AdminPassengerRideStatsDTO> stats = new HashMap<>();
+
+        for(Ride ride: rides) {
+            LocalDate localDate = Instant.ofEpochSecond(ride.getRideRequest().getTimestamp()).atZone(ZoneId.systemDefault()).toLocalDate();
+            Month month = localDate.getMonth();
+            AdminPassengerRideStatsDTO dto = stats.get(month);
+            if(dto == null) {
+                stats.put(month, new AdminPassengerRideStatsDTO(1,ride.getPayment()));
+            }
+            else {
+                dto.setCount(dto.getCount()+1);
+                dto.setPaymentSum(dto.getPaymentSum()+ ride.getPayment());
+            }
+        }
+
+        return stats;
+    }
+
     public Complain rideComplain(String phone, String id, String complainString) {
         Optional<Ride> rideOptional = rideRepository.findById(id);
         if(rideOptional.isEmpty())

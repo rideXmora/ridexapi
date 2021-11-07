@@ -182,6 +182,13 @@ public class AdminController {
         return passengerService.getPastRidesStats(data.getPhone());
     }
 
+    @GetMapping("/passenger/adminRidesStats")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get ride stats in monthly basis")
+    public Map<Month, AdminPassengerRideStatsDTO> getAdminRidesStats() {
+        return passengerService.getAdminRidesStats();
+    }
+
     @GetMapping("/driver/all")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all drivers")
