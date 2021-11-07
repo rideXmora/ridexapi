@@ -9,6 +9,7 @@ import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.daoHelper.Payment;
 import ml.ridex.ridexapi.model.daoHelper.TopDriver;
+import ml.ridex.ridexapi.model.dto.AdminPassengerRideStatsDTO;
 import ml.ridex.ridexapi.model.dto.OrgAdminPaymentDTO;
 import ml.ridex.ridexapi.repository.ComplainRepository;
 import ml.ridex.ridexapi.repository.DriverRepository;
@@ -17,9 +18,11 @@ import ml.ridex.ridexapi.repository.RideRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
+import java.util.*;
 
 @Service
 public class OrgAdminService {
@@ -118,5 +121,26 @@ public class OrgAdminService {
         OrgAdmin orgAdmin = this.getOrgAdmin(orgPhone);
         List<TopDriver> sts = rideRepository.groupByTopDriver(orgAdmin.getId());
         return  sts;
+    }
+
+    public Map<Month, AdminPassengerRideStatsDTO> getOrgAdminRidesStats(String phone) throws EntityNotFoundException{
+        OrgAdmin orgAdmin = this.getOrgAdmin(phone);
+        List<Ride> rides = rideRepository.findByRideRequestOrganizationId(orgAdmin.getId());
+        Map<Month, AdminPassengerRideStatsDTO> stats = new HashMap<>();
+
+        for(Ride ride: rides) {
+            LocalDate localDate = Instant.ofEpochSecond(ride.getRideRequest().getTimestamp()).atZone(ZoneId.systemDefault()).toLocalDate();
+            Month month = localDate.getMonth();
+            AdminPassengerRideStatsDTO dto = stats.get(month);
+            if(dto == null) {
+                stats.put(month, new AdminPassengerRideStatsDTO(1,ride.getPayment()));
+            }
+            else {
+                dto.setCount(dto.getCount()+1);
+                dto.setPaymentSum(dto.getPaymentSum()+ ride.getPayment());
+            }
+        }
+
+        return stats;
     }
 }
