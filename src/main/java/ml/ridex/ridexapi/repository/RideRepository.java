@@ -3,6 +3,7 @@ package ml.ridex.ridexapi.repository;
 import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.daoHelper.TopDriver;
+import ml.ridex.ridexapi.model.daoHelper.TopPassenger;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -37,4 +38,8 @@ public interface RideRepository extends MongoRepository<Ride, String> {
             , "{ $group: { _id: { driver: '$rideRequest.driver._id', phone:'$rideRequest.driver.phone', name:'$rideRequest.driver.name' }, total: {$sum:'$payment'} } }"
     , "{ '$sort': { total: -1 } }"})
     public  List<TopDriver> groupByTopDriver(String id);
+
+    @Aggregation(pipeline = {"{ $group: { _id: { passenger: '$rideRequest.passenger._id', phone:'$rideRequest.passenger.phone', name:'$rideRequest.passenger.name' }, total: {$sum:'$payment'} } }"
+            , "{ '$sort': { total: -1 } }"})
+    public  List<TopPassenger> groupByTopPassenger();
 }

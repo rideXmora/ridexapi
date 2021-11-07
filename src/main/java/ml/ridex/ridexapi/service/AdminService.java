@@ -2,6 +2,7 @@ package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.model.dao.*;
+import ml.ridex.ridexapi.model.daoHelper.TopPassenger;
 import ml.ridex.ridexapi.model.dto.DriverDTO;
 import ml.ridex.ridexapi.model.dto.OrgAdminDTO;
 import ml.ridex.ridexapi.model.dto.PassengerDTO;
@@ -82,6 +83,11 @@ public class AdminService {
             totalIncome += orgAdmin.getTotalIncome();
         }
         return totalIncome;
+    }
+
+    public List<TopPassenger> getTopPassengers() {
+        List<TopPassenger> sts = rideRepository.groupByTopPassenger();
+        return  sts;
     }
 
     private PassengerDTO convertToPassengerDTO(Passenger passenger) {
