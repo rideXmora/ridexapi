@@ -116,7 +116,7 @@ public class OrgAdminService {
 
     public List<TopDriver> getTopDrivers(String orgPhone) {
         OrgAdmin orgAdmin = this.getOrgAdmin(orgPhone);
-        List<TopDriver> sts = rideRepository.groupByTopDriver();
+        List<TopDriver> sts = rideRepository.groupByTopDriver(orgAdmin.getId());
         return  sts;
     }
 }

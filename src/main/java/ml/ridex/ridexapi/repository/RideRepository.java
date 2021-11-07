@@ -33,7 +33,8 @@ public interface RideRepository extends MongoRepository<Ride, String> {
                                                            long startEpoch,
                                                            long endEpoch);
 
-    @Aggregation(pipeline = {"{ $group: { _id: { driver: '$rideRequest.driver._id', phone:'$rideRequest.driver.phone', name:'$rideRequest.driver.name' }, total: {$sum:'$payment'} } }"
+    @Aggregation(pipeline = {"{  $match: {'rideRequest.organization._id': ?0 } }"
+            , "{ $group: { _id: { driver: '$rideRequest.driver._id', phone:'$rideRequest.driver.phone', name:'$rideRequest.driver.name' }, total: {$sum:'$payment'} } }"
     , "{ '$sort': { total: -1 } }"})
-    public  List<TopDriver> groupByTopDriver();
+    public  List<TopDriver> groupByTopDriver(String id);
 }
