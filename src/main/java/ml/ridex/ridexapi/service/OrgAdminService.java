@@ -102,4 +102,14 @@ public class OrgAdminService {
         OrgAdmin orgAdmin = this.getOrgAdmin(phone);
         return complainRepository.findByRideRideRequestOrganizationId(orgAdmin.getId());
     }
+
+    public Complain changeComplainState(String id, String phone, ComplainStatus status) throws EntityNotFoundException {
+        OrgAdmin orgAdmin = this.getOrgAdmin(phone);
+        Optional<Complain> complainOptional = complainRepository.findByIdAndRideRideRequestOrganizationId(id, orgAdmin.getId());
+        if(complainOptional.isEmpty())
+            throw new EntityNotFoundException("Can't find the record");
+        Complain complain = complainOptional.get();
+        complain.setComplainStatus(status);
+        return complainRepository.save(complain);
+    }
 }

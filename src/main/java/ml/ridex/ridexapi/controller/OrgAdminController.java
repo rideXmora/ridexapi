@@ -178,6 +178,17 @@ public class OrgAdminController {
         }
     }
 
+    @PostMapping("/ride/complain/changeStatus")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get ride complains")
+    public Complain changeComplainStatus(@Valid @RequestBody ComplainChangeStatusDTO data, Principal principal) {
+        try {
+            return orgAdminService.changeComplainState(data.getId(), principal.getName(), data.getComplainStatus());
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
     private DriverDTO convertToDriverDTO(Driver driver) {
         return modelMapper.map(driver, DriverDTO.class);
     }
