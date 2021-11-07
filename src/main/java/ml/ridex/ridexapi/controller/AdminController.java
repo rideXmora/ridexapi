@@ -192,7 +192,7 @@ public class AdminController {
     @GetMapping("/orgAdmin/all")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all drivers")
-    public List<OrgAdmin> getOrgAdminList() {
+    public List<OrgAdminDTO> getOrgAdminList() {
         return adminService.getOrgAdminList();
     }
 

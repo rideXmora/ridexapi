@@ -26,4 +26,6 @@ public class OrgAdminDTO {
     private Double totalIncome;
 
     private Boolean enabled;
+
+    private Boolean suspend;
 }

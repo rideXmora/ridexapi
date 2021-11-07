@@ -3,6 +3,7 @@ package ml.ridex.ridexapi.service;
 import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.model.dao.*;
 import ml.ridex.ridexapi.model.dto.DriverDTO;
+import ml.ridex.ridexapi.model.dto.OrgAdminDTO;
 import ml.ridex.ridexapi.model.dto.PassengerDTO;
 import ml.ridex.ridexapi.repository.*;
 import org.modelmapper.ModelMapper;
@@ -61,8 +62,17 @@ public class AdminService {
         return driverDTOS;
     }
 
-    public List<OrgAdmin> getOrgAdminList() {
-        return orgAdminRepository.findAll();
+    public List<OrgAdminDTO> getOrgAdminList() {
+        List<User> orgAdminsAsUsers = userRepository.findByRolesIn(Arrays.asList(Role.ORG_ADMIN));
+        List<OrgAdmin> orgAdminList = orgAdminRepository.findAll();
+        List<OrgAdminDTO> orgAdminDTOList = orgAdminList.stream().map(this::convertToOrgAdminDTO).collect(Collectors.toList());
+        for(OrgAdminDTO dto: orgAdminDTOList) {
+            User oUser = orgAdminsAsUsers.stream()
+                    .filter(user -> dto.getPhone().equals(user.getPhone())).findAny().orElse(null);
+            if(oUser != null)
+                dto.setSuspend(oUser.getSuspend());
+        }
+        return orgAdminDTOList;
     }
 
     public Double totalIncome() {
@@ -80,5 +90,9 @@ public class AdminService {
 
     private DriverDTO convertToDriverDTO(Driver driver) {
         return modelMapper.map(driver, DriverDTO.class);
+    }
+
+    private OrgAdminDTO convertToOrgAdminDTO(OrgAdmin orgAdmin) {
+        return modelMapper.map(orgAdmin, OrgAdminDTO.class);
     }
 }
