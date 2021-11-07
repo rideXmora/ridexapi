@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
+import ml.ridex.ridexapi.model.dao.Complain;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
@@ -161,6 +162,17 @@ public class OrgAdminController {
                     data.getPhone(),
                     data.getStartEpoch(),
                     data.getEndEpoch());
+        } catch(EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @GetMapping("/ride/complains")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get ride complains")
+    public List<Complain> getComplainList(Principal principal) {
+        try {
+            return orgAdminService.getComplainList(principal.getName());
         } catch(EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }

@@ -1,12 +1,15 @@
 package ml.ridex.ridexapi.service;
 
+import ml.ridex.ridexapi.enums.ComplainStatus;
 import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
+import ml.ridex.ridexapi.model.dao.Complain;
 import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.daoHelper.Payment;
 import ml.ridex.ridexapi.model.dto.OrgAdminPaymentDTO;
+import ml.ridex.ridexapi.repository.ComplainRepository;
 import ml.ridex.ridexapi.repository.DriverRepository;
 import ml.ridex.ridexapi.repository.OrgAdminRepository;
 import ml.ridex.ridexapi.repository.RideRepository;
@@ -27,6 +30,9 @@ public class OrgAdminService {
 
     @Autowired
     private RideRepository rideRepository;
+
+    @Autowired
+    private ComplainRepository complainRepository;
 
     public OrgAdmin getOrgAdmin(String phone) {
         Optional<OrgAdmin> orgAdmin = orgAdminRepository.findByPhone(phone);
@@ -90,5 +96,10 @@ public class OrgAdminService {
 
     public List<Ride> getPastRidesBetweenTimePeriod(String orgId, String driverPhone, long startEpoch, long endEpoch) {
         return rideRepository.findByRideRequestBetweenTimeInterval(orgId, driverPhone, RideStatus.CONFIRMED, startEpoch, endEpoch);
+    }
+
+    public List<Complain> getComplainList(String phone) throws EntityNotFoundException{
+        OrgAdmin orgAdmin = this.getOrgAdmin(phone);
+        return complainRepository.findByRideRideRequestOrganizationId(orgAdmin.getId());
     }
 }
