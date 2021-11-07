@@ -41,6 +41,8 @@ public class NotificationService {
         rideSummary.put("passengerRating", rideRequest.getPassenger().getRating().toString());
         rideSummary.put("startLocationX", rideRequest.getStartLocation().getX().toString());
         rideSummary.put("startLocationY", rideRequest.getStartLocation().getY().toString());
+        rideSummary.put("endLocationX", rideRequest.getEndLocation().getX().toString());
+        rideSummary.put("endLocationY", rideRequest.getEndLocation().getY().toString());
 
         NotificationRequestDTO dto = new NotificationRequestDTO(TOPIC, TITLE, BODY);
         fcmService.sendPnsToTopic(dto, rideSummary);
