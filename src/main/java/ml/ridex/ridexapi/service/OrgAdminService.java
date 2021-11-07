@@ -8,6 +8,7 @@ import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.daoHelper.Payment;
+import ml.ridex.ridexapi.model.daoHelper.TopDriver;
 import ml.ridex.ridexapi.model.dto.OrgAdminPaymentDTO;
 import ml.ridex.ridexapi.repository.ComplainRepository;
 import ml.ridex.ridexapi.repository.DriverRepository;
@@ -111,5 +112,11 @@ public class OrgAdminService {
         Complain complain = complainOptional.get();
         complain.setComplainStatus(status);
         return complainRepository.save(complain);
+    }
+
+    public List<TopDriver> getTopDrivers(String orgPhone) {
+        OrgAdmin orgAdmin = this.getOrgAdmin(orgPhone);
+        List<TopDriver> sts = rideRepository.groupByTopDriver();
+        return  sts;
     }
 }

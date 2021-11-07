@@ -12,6 +12,7 @@ import ml.ridex.ridexapi.model.dao.Driver;
 import ml.ridex.ridexapi.model.dao.OrgAdmin;
 import ml.ridex.ridexapi.model.dao.Ride;
 import ml.ridex.ridexapi.model.daoHelper.Payment;
+import ml.ridex.ridexapi.model.daoHelper.TopDriver;
 import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.service.OrgAdminService;
 import ml.ridex.ridexapi.service.UserService;
@@ -117,6 +118,12 @@ public class OrgAdminController {
         } catch(EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
+
+    @GetMapping("/driver/top")
+    @ResponseStatus(HttpStatus.OK)
+    public List<TopDriver> getTopDrivers(Principal principal) {
+        return  orgAdminService.getTopDrivers(principal.getName());
     }
 
     @PostMapping("/setPayment")
