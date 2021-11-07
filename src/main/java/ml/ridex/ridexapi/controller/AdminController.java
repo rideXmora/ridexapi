@@ -8,10 +8,8 @@ import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.helper.PasswordGenerator;
-import ml.ridex.ridexapi.model.dao.Driver;
-import ml.ridex.ridexapi.model.dao.OrgAdmin;
-import ml.ridex.ridexapi.model.dao.Passenger;
 import ml.ridex.ridexapi.model.dao.Ride;
+import ml.ridex.ridexapi.model.daoHelper.TopPassenger;
 import ml.ridex.ridexapi.model.dto.*;
 import ml.ridex.ridexapi.service.AdminService;
 import ml.ridex.ridexapi.service.EmailSender;
@@ -28,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.List;
@@ -208,6 +207,12 @@ public class AdminController {
     @Operation(summary = "Total income")
     public Double getTotalIncome() {
         return adminService.totalIncome();
+    }
+
+    @GetMapping("/passenger/top")
+    @ResponseStatus(HttpStatus.OK)
+    public List<TopPassenger> getTopDrivers(Principal principal) {
+        return  adminService.getTopPassengers();
     }
 
 }

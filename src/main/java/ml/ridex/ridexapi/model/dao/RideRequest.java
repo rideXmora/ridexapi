@@ -2,6 +2,7 @@ package ml.ridex.ridexapi.model.dao;
 
 import lombok.Data;
 import ml.ridex.ridexapi.enums.RideRequestStatus;
+import ml.ridex.ridexapi.enums.VehicleType;
 import ml.ridex.ridexapi.model.daoHelper.DriverOrganization;
 import ml.ridex.ridexapi.model.daoHelper.Location;
 import ml.ridex.ridexapi.model.daoHelper.RideRequestDriver;
@@ -23,6 +24,8 @@ public class RideRequest {
 
     private Integer distance;
 
+    private VehicleType vehicleType;
+
     private RideRequestStatus status;
 
     private RideRequestDriver driver;
@@ -36,6 +39,7 @@ public class RideRequest {
             Location startLocation,
             Location endLocation,
             Integer distance,
+            VehicleType vehicleType,
             RideRequestStatus status,
             RideRequestDriver driver,
             DriverOrganization organization,
@@ -44,6 +48,7 @@ public class RideRequest {
         this.startLocation = startLocation;
         this.endLocation = endLocation;
         this.distance = distance;
+        this.vehicleType = vehicleType;
         this.status = status;
         this.driver = driver;
         this.organization = organization;

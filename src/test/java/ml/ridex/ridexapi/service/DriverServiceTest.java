@@ -55,7 +55,8 @@ class DriverServiceTest {
     @BeforeEach
     void setup() {
         driverService = new DriverService();
-        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, null, null,"token" ,DriverStatus.OFFLINE,false);
+        Vehicle vehicle = new Vehicle("123",VehicleType.CAR,"model","12312","sds","wqa");
+        driver = new Driver("94714461798", null, null,null ,null,0,0, 0,0, vehicle, null,"token" ,DriverStatus.OFFLINE,false);
         phone = "+94714461798";
         driverOrganization = new DriverOrganization();
         driverOrganization.setName("Uber");
@@ -133,6 +134,7 @@ class DriverServiceTest {
                 sl,
                 sl,
                 10000,
+                VehicleType.CAR,
                 RideRequestStatus.PENDING,
                 new RideRequestDriver("idDr",phone,"The rider", new RideRequestVehicle("Nw",VehicleType.CAR,"Nixxan"),12.78),
                 driverOrganization,
@@ -156,7 +158,7 @@ class DriverServiceTest {
         when(driverRepository.findByPhone(anyString())).thenReturn(Optional.ofNullable(driver));
         when(driverRepository.save(any(Driver.class))).thenReturn(driver);
         when(redisDriverStateRepository.save(any(DriverState.class))).thenReturn(driverState);
-        doNothing().when(notificationService).subscribeToRideTopic(anyString());
+        doNothing().when(notificationService).subscribeToRideTopic(anyString(), any(VehicleType.class));
 
         assertThat(driverService.toggleStatus(phone, location).getDriverStatus()).isEqualTo(DriverStatus.ONLINE);
     }

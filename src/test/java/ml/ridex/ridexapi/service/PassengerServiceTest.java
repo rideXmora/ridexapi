@@ -1,6 +1,7 @@
 package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.RideRequestStatus;
+import ml.ridex.ridexapi.enums.VehicleType;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.Passenger;
@@ -85,6 +86,7 @@ class PassengerServiceTest {
                 sl,
                 sl,
                 10000,
+                VehicleType.CAR,
                 RideRequestStatus.PENDING,
                 null,
                 null,
@@ -93,6 +95,6 @@ class PassengerServiceTest {
         when(passengerRepository.findByPhone(phone)).thenReturn(Optional.ofNullable(passenger));
         when(rideRequestRepository.save(any(RideRequest.class))).thenReturn(rideRequest);
 
-        assertThat(passengerService.createRideRequest(phone, sl, sl, 10000)).isNotNull();
+        assertThat(passengerService.createRideRequest(phone, sl, sl, 10000, VehicleType.CAR)).isNotNull();
     }
 }
