@@ -181,13 +181,13 @@ public class DriverService {
         Driver driver = getDriver(phone);
         if(driver.getDriverStatus() == DriverStatus.ONLINE) {
             driver.setDriverStatus(DriverStatus.OFFLINE);
-            notificationService.unsubscribeFromRideTopic(driver.getNotificationToken());
+            notificationService.unsubscribeFromRideTopic(driver.getNotificationToken(), driver.getVehicle().getVehicleType());
             redisDriverStateRepository.deleteById(phone);
         }
         else {
             driver.setDriverStatus(DriverStatus.ONLINE);
             state = new DriverState(phone, location, Instant.now().getEpochSecond(), driver.getNotificationToken());
-            notificationService.subscribeToRideTopic(driver.getNotificationToken());
+            notificationService.subscribeToRideTopic(driver.getNotificationToken(), driver.getVehicle().getVehicleType());
             redisDriverStateRepository.save(state);
         }
         return driverRepository.save(driver);

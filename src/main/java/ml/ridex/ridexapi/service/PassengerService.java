@@ -3,6 +3,7 @@ package ml.ridex.ridexapi.service;
 import ml.ridex.ridexapi.enums.ComplainStatus;
 import ml.ridex.ridexapi.enums.RideRequestStatus;
 import ml.ridex.ridexapi.enums.RideStatus;
+import ml.ridex.ridexapi.enums.VehicleType;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
 import ml.ridex.ridexapi.model.dao.*;
@@ -72,7 +73,7 @@ public class PassengerService {
         return passengerRepository.save(passenger);
     }
 
-    public RideRequest createRideRequest(String phone, Location startLocation, Location endLocation, Integer distance)
+    public RideRequest createRideRequest(String phone, Location startLocation, Location endLocation, Integer distance, VehicleType vehicleType)
             throws EntityNotFoundException, InvalidOperationException {
         Passenger passenger = this.getPassenger(phone);
         Integer totalRides = passenger.getTotalRides();
@@ -88,6 +89,7 @@ public class PassengerService {
                 startLocation,
                 endLocation,
                 distance,
+                vehicleType,
                 RideRequestStatus.PENDING,
                 null,
                 null,
@@ -102,7 +104,7 @@ public class PassengerService {
         for(DriverState driverState: drivers) {
             tokens.add(driverState.getNotificationToken());
         }
-        notificationService.notifyDrivers(rideRequest, tokens);
+        notificationService.notifyDrivers(rideRequest, tokens, rideRequest.getVehicleType());
     }
 
     public RideRequest rideRequestTimeout(String phone, String id) {
