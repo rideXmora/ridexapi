@@ -1,22 +1,17 @@
 package ml.ridex.ridexapi.service;
 
+import ml.ridex.ridexapi.enums.ComplainStatus;
 import ml.ridex.ridexapi.enums.RideRequestStatus;
 import ml.ridex.ridexapi.enums.RideStatus;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
 import ml.ridex.ridexapi.exception.InvalidOperationException;
-import ml.ridex.ridexapi.model.dao.Driver;
-import ml.ridex.ridexapi.model.dao.Passenger;
-import ml.ridex.ridexapi.model.dao.Ride;
-import ml.ridex.ridexapi.model.dao.RideRequest;
+import ml.ridex.ridexapi.model.dao.*;
 import ml.ridex.ridexapi.model.daoHelper.Location;
 import ml.ridex.ridexapi.model.daoHelper.RideRequestPassenger;
 import ml.ridex.ridexapi.model.dto.AdminPassengerRideStatsDTO;
 import ml.ridex.ridexapi.model.dto.AdminPassengerRidesDTO;
 import ml.ridex.ridexapi.model.redis.DriverState;
-import ml.ridex.ridexapi.repository.PassengerRepository;
-import ml.ridex.ridexapi.repository.RedisDriverStateRepository;
-import ml.ridex.ridexapi.repository.RideRepository;
-import ml.ridex.ridexapi.repository.RideRequestRepository;
+import ml.ridex.ridexapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +31,9 @@ public class PassengerService {
 
     @Autowired
     private RideRepository rideRepository;
+
+    @Autowired
+    private ComplainRepository complainRepository;
 
     @Autowired
     private RedisDriverStateRepository redisDriverStateRepository;
@@ -161,5 +159,16 @@ public class PassengerService {
         }
 
         return stats;
+    }
+
+    public Complain rideComplain(String phone, String id, String complainString) {
+        Optional<Ride> rideOptional = rideRepository.findById(id);
+        if(rideOptional.isEmpty())
+            throw new EntityNotFoundException("Invalid ride id");
+        Ride ride = rideOptional.get();
+        if(!ride.getRideRequest().getPassenger().getPhone().equals(phone))
+            throw new InvalidOperationException("Invalid access");
+        Complain complain = new Complain(ride, null, complainString, ComplainStatus.RAISED);
+        return complainRepository.save(complain);
     }
 }
