@@ -172,6 +172,21 @@ public class PassengerController {
         return passengerService.getPastRides(principal.getName()).stream().map(this::convertToCommonRideDTO).collect(Collectors.toList());
     }
 
+    @PostMapping("/ride/complain")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Raise a complain")
+    public RideComplainResDTO rideComplain(@Valid @RequestBody RideComplainReqDTO data, Principal principal) {
+        try {
+            return modelMapper.map(passengerService.rideComplain(principal.getName(), data.getId(), data.getComplain()),
+                    RideComplainResDTO.class);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (InvalidOperationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+
+    }
+
     private CommonRideDTO convertToCommonRideDTO(Ride ride) {
         return modelMapper.map(ride, CommonRideDTO.class);
     }
