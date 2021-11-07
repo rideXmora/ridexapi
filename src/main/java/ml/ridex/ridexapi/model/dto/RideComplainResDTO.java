@@ -6,6 +6,7 @@ import ml.ridex.ridexapi.enums.ComplainStatus;
 @Data
 public class RideComplainResDTO {
     private String id;
-    private String complain;
+    private String driverComplain;
+    private String passengerComplain;
     private ComplainStatus complainStatus;
 }
