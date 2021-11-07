@@ -25,7 +25,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.time.Month;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -194,6 +196,18 @@ public class OrgAdminController {
         } catch(EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
+    }
+
+    @GetMapping("/driver/adminRidesStats")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get ride stats in monthly basis")
+    public Map<Month, AdminPassengerRideStatsDTO> getAdminRidesStats(Principal principal) {
+        try {
+            return orgAdminService.getOrgAdminRidesStats(principal.getName());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+
     }
 
     private DriverDTO convertToDriverDTO(Driver driver) {
