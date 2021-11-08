@@ -2,20 +2,17 @@ package ml.ridex.ridexapi.service;
 
 import ml.ridex.ridexapi.enums.ComplainStatus;
 import ml.ridex.ridexapi.enums.RideStatus;
+import ml.ridex.ridexapi.enums.Role;
 import ml.ridex.ridexapi.exception.EntityNotFoundException;
-import ml.ridex.ridexapi.model.dao.Complain;
-import ml.ridex.ridexapi.model.dao.Driver;
-import ml.ridex.ridexapi.model.dao.OrgAdmin;
-import ml.ridex.ridexapi.model.dao.Ride;
+import ml.ridex.ridexapi.model.dao.*;
 import ml.ridex.ridexapi.model.daoHelper.Payment;
 import ml.ridex.ridexapi.model.daoHelper.TopDriver;
 import ml.ridex.ridexapi.model.dto.AdminPassengerRideStatsDTO;
+import ml.ridex.ridexapi.model.dto.OrgAdminDTO;
 import ml.ridex.ridexapi.model.dto.OrgAdminPaymentDTO;
-import ml.ridex.ridexapi.repository.ComplainRepository;
-import ml.ridex.ridexapi.repository.DriverRepository;
-import ml.ridex.ridexapi.repository.OrgAdminRepository;
-import ml.ridex.ridexapi.repository.RideRepository;
+import ml.ridex.ridexapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -37,6 +34,12 @@ public class OrgAdminService {
 
     @Autowired
     private ComplainRepository complainRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public OrgAdmin getOrgAdmin(String phone) {
         Optional<OrgAdmin> orgAdmin = orgAdminRepository.findByPhone(phone);
