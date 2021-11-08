@@ -21,6 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -53,6 +56,9 @@ public class AdminController {
 
     @Autowired
     private EmailSender emailSender;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Value("${ADMIN_EMAIL_ADDRESS}")
     private String adminEmailAddress;
@@ -215,4 +221,18 @@ public class AdminController {
         return  adminService.getTopPassengers();
     }
 
+    @PostMapping("/changePassword")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Change password")
+    public UserDTO changePassword(@Valid @RequestBody ChangePasswordDTO data, Principal principal) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(principal.getName(), data.getOldPassword()));
+            return modelMapper.map(userService.changePassword(principal.getName(), data.getNewPassword()), UserDTO.class);
+
+        } catch (InvalidOperationException | EntityNotFoundException | AuthenticationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (DuplicateKeyException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is suspended");
+        }
+    }
 }

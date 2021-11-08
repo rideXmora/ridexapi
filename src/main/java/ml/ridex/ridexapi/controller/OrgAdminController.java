@@ -69,7 +69,7 @@ public class OrgAdminController {
     public UserDTO changePassword(@Valid @RequestBody ChangePasswordDTO data, Principal principal) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(principal.getName(), data.getOldPassword()));
-            return modelMapper.map(orgAdminService.changePassword(principal.getName(), data.getNewPassword()), UserDTO.class);
+            return modelMapper.map(userService.changePassword(principal.getName(), data.getNewPassword()), UserDTO.class);
 
         } catch (InvalidOperationException | EntityNotFoundException | AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());

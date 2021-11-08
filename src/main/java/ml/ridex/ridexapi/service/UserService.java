@@ -279,4 +279,13 @@ public class UserService implements UserDetailsService {
         user.setSuspend(suspend);
         return userRepository.save(user);
     }
+
+    public User changePassword(String phone, String password) {
+        Optional<User> userOptional = userRepository.findByPhoneAndSuspend(phone, false);
+        if(userOptional.isEmpty())
+            throw new EntityNotFoundException("Can't find the user record");
+        User user = userOptional.get();
+        user.setPassword(passwordEncoder.encode(password));
+        return userRepository.save(user);
+    }
 }
