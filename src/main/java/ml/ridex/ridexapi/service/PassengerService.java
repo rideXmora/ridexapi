@@ -99,10 +99,17 @@ public class PassengerService {
     }
 
     public void notifyDrivers(RideRequest rideRequest) {
+        double RADIUS = 5000.0;
         List<DriverState> drivers = (List<DriverState>) redisDriverStateRepository.findAll();
         List<String> tokens = new ArrayList<>();
         for(DriverState driverState: drivers) {
-            tokens.add(driverState.getNotificationToken());
+            double x1 = rideRequest.getStartLocation().getX();
+            double y1 = rideRequest.getStartLocation().getY();
+            double x2 = rideRequest.getEndLocation().getX();
+            double y2 = rideRequest.getEndLocation().getY();
+            if(Math.pow(x1-x2,2) + Math.pow(y1-y2,2) < Math.pow(RADIUS,2)){
+                tokens.add(driverState.getNotificationToken());
+            }
         }
         notificationService.notifyDrivers(rideRequest, tokens, rideRequest.getVehicleType());
     }
