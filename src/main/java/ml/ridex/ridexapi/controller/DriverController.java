@@ -110,7 +110,7 @@ public class DriverController {
             Ride ride = driverService.acceptRideRequest(principal.getName(), data.getId());
             driverService.notifyPassenger(ride);
             return modelMapper.map(ride, CommonRideDTO.class);
-        } catch (EntityNotFoundException | InvalidOperationException e ) {
+        } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
