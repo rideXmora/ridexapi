@@ -150,7 +150,7 @@ public class DriverService {
         return rideRepository.save(ride);
     }
 
-    public void notifyPassenger(Ride ride) throws EntityNotFoundException {
+    public void notifyPassenger(Ride ride) throws EntityNotFoundException, InvalidOperationException {
         // Can remove if rideRequest has the notification token
         Passenger passenger = passengerService.getPassenger(ride.getRideRequest().getPassenger().getPhone());
         String message;
