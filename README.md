@@ -1,10 +1,10 @@
 # ridexapi
 
-###Requirements
+### Requirements
 * java 11 - OpenJDK11 is recommended
 * Apache maven - version 3.8.2 is recommended
 
-###Set up the development server
+### Set up the development server
 * Clone the git repository -`git clone https://github.com/Thalassemia-Registry/Backend.git`
 * Open the project in your favourite IDE. (I used IntelliJ IDEA community version https://www.jetbrains.com/idea/download/ )
 * Goto `pom.xml` and add missing packages.
@@ -14,15 +14,15 @@
 * ####Run this command to run the development server
 `clean spring-boot:run -Dspring-boot.run.arguments=--spring.config.location=config.properties,classpath:/application.properties -Dspring-boot.run.fork=false`
 
-###Run tests
+### Run tests
 `./mvnw test`
 
-###Production server
-####To build a jar
+### Production server
+#### To build a jar
 `mvn clean package`
-####To run the jar
+#### To run the jar
 ` java -jar target/ridexapi.jar --spring.config.location=config.properties,classpath:/application.properties`
 
-###API documentation - 
+### API documentation - 
 * local - http://localhost:8080/swagger-ui.html
 * hosted - http://ridex.ml/api/swagger-ui.html
